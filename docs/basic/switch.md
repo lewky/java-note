@@ -1,12 +1,12 @@
 <!--
 date: 2021-03-29T23:31:12+08:00
-lastmod: 2021-03-29T23:31:12+08:00
+lastmod: 2021-04-08T23:31:12+08:00
 -->
 ## switch
 
 ### 为什么switch不支持long
 
-在 Java 语言规范里中，有说明 switch 支持的类型有：char、byte、short、int、Character、Byte、Short、Integer、String、enum。
+在 Java 语言规范里中，有说明 switch 支持的类型有：char、byte、short、int、Character、Byte、Short、Integer、String、enum。（jdk1.7之后switch才支持String类型）
 
 为什么只支持上面几种？int、String 都可以，为什么不支持 long ？
 

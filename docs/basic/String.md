@@ -1,14 +1,77 @@
 <!--
 date: 2021-03-27T23:48:12+08:00
-lastmod: 2021-03-27T23:48:12+08:00
+lastmod: 2021-04-08T23:48:12+08:00
 -->
+## String的不可变
+
+String和包装类一样，都是final的，都实现了Serializable接口。
+
+String是不可变的，原因是内部用于存储字符的`value`数组变量是final的，一旦被初始化就不可重新赋值；且String没有提供修改value这个数组变量的方法。
+
+String还有一个重要的变量`hash`，即所谓的哈希：
+```java
+/** Cache the hash code for the string */
+private int hash; // Default to 0
+```
+
+在jdk1.8中，用char数组存储字符串：
+```java
+/** The value is used for character storage. */
+private final char value[];
+```
+
+在jdk1.9之后，用byte数组存储字符串，并用`coder`标识字节的编码：
+```java
+/** The value is used for character storage. */
+private final byte[] value;
+
+/** The identifier of the encoding used to encode the bytes in {@code value}. */
+private final byte coder;
+```
+
+### 为什么jdk1.9改用byte数组来存储字符串
+
+主要是为了节省空间。
+
+char占据两个字节，byte占据一个字节。对于char，如果存储的字符串是LATIN1编码(即ISO-8859-1)，那么就只需要一个字节，高位的空间其实浪费了。所以在jdk1.9中，通过byte数组和coder编码来存储字符串，可以在使用单字节编码时(WINDOWS-1252、ISO-8859-1、UTF-8)起到节省空间的作用。
+
+coder变量只有两个值：0和1。
+* 0 代表Latin-1（单字节编码）
+* 1 代表 UTF-16 编码（双字节编码）
+
+* [Java9 后String 为什么使用byte[]而不是char?](https://www.jianshu.com/p/9043243df546)
+
+### 为什么String不可变
+
+1. 可以存储于字符串常量池（String Pool）。
+
+只有当String是不可变的，才能确保从字符串常量池中获取到的字符串引用不会指向一个错误的字符串对象（防止String的值被修改）。
+
+2. 方便缓存hashcode。
+
+因为String的不可变，可以保证hash也不会改变，只需要计算一次hash即可。虽然hash可以标识一个String对象，但是并不能单纯拿hash来对比两个String是否相等。hash值存在碰撞的可能，但是可以快速定位数据，缩小需要查找的数据范围。比如从jdk1.7开始switch支持String类型，就是用了hash + equals来实现的。
+
+3. 辅助其它对象的使用。
+
+比如在一个HashSet中存储String对象，只有String是不可变的，才能确保不会违反Set中元素不重复的设计。
+
+4. 安全性。
+
+String经常作为方法参数来传递，比如说作为网络连接、账号密码等参数，如果String的值是可变的，就可能导致上下文值不相同的情况，可能导致系统安全性的问题。
+
+5. 线程安全。
+
+不可变对象是天然的线程安全的，可以在多线程中安全地使用。
+
+* [Why String is immutable in Java?](https://www.programcreek.com/2013/04/why-string-is-immutable-in-java/)
+
 ## 编译时常量和运行时常量
 
 被`static final`修饰的String是常量，其值一旦确定下来就不可再变化，即不可重新赋值。并且根据编译器的不同行为，可分为编译时常量和运行时常量。
 
 编译时常量会在编译成class文件时被替换为对应的值（即字面量），也就是说，编译时常量在编译阶段就已经可以确定值，该常量的引用在当前class文件里是找不到的。基本数据类型、String字面量以及只涉及到这二者的常量表达式，都是编译时常量。
 
-运行时常量是在运行阶段才能确定值的常量，除了基本数据类型和String字面量（即非nwe出来的String）以外的常量，都是运行时常量。
+运行时常量是在运行阶段才能确定值的常量，除了基本数据类型和String字面量（即非new出来的String）以外的常量，都是运行时常量。
 
 运行时常量涉及到常量类的初始化，而编译时常量则不会，因为编译时常量在编译阶段就被替换为字面量，其引用被优化掉了，所以不需要初始化常量类。
 
@@ -113,7 +176,7 @@ public class TestA2 {
 }
 ```
 
-可以看到，只涉及到基本数据类型和字符串字面量的常量表达式依然是编译时常量，而包装类则是运行时常量，对于new出来的String，也是运行时常量（有兴趣的可以试试）。
+可以看到，只涉及到基本数据类型和字符串字面量的常量表达式依然是编译时常量，而包装类常量则是运行时常量。对于new出来的String，在赋值给常量后也是运行时常量（有兴趣的可以试试）。
 
 可以认为，Java对于基本数据类型和字符串字面量做了特殊的处理，因为二者可以放入常量池，不依赖于类，在编译期即可确定值。
 
@@ -164,8 +227,32 @@ public class Version
 
 可以看到这里实际上存入了好几个字符串到常量池里，当然可能还有其他地方也存入了别的字符串。想更深入地了解intern()的底层实现，可以看看这篇文章：[深入分析String.intern和String常量的实现原理](https://www.jianshu.com/p/c14364f72b7e)。
 
+## String，StringBuffer，StringBuilder
+
+### 可变性
+
+* String是不可变的
+* StringBuffer和StringBuilder是可变的
+
+### 线程安全
+
+* String是线程安全的，由String的不可变保证的
+* StringBuffer是线程安全的，由synchronize保证
+* StringBuilder是线程不安全的，但是性能比StringBuffer更加高效。在没有线程安全问题时使用StringBuilder就够了。
+
+## 二进制安全字符串（Binary-safe strings）
+
+>在 C 语言中，字符串里面不能包含空字符'\0'，否则这个空字符会被当做是字符串结尾，换句话说，C 语言的字符串默认是以 '\0' 结尾的，这不是二进制安全的，因为图片、音频等二进制数据里面会有 '\0' 这一字符，C 字符串会忽略 '\0' 这一字符后面的数据。
+
+换言之，二进制安全字符就是不管输入什么字节都能正确处理，即使包含了零值字节。
+
+Redis的字符串就是二进制安全的。
+
+* [什么是二进制安全？](https://www.zhihu.com/question/24214241/answer/262778202)
+
 ## 参考链接
 
+* [二、String](http://cyc2018.gitee.io/cs-notes/#/notes/Java%20基础?id=%e4%ba%8c%e3%80%81string)
 * [编译时常量和运行时常量](https://blog.csdn.net/Honeyhanyu/article/details/77878120?locationNum=6&fps=1)
 * [java谜题--java运行时修改引用类的静态常量](https://blog.csdn.net/feiyu8607/article/details/7064751)
 * [不同JDK版本中String.intern()方法的区别](https://blog.csdn.net/Game_Zmh/article/details/101701708)
