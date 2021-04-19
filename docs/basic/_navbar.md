@@ -1,4 +1,4 @@
-* <i class="fas fa-fw fa-th"></i> Home
+* <i class="fas fa-fw fa-th"></i> Note
 	* [<i class="fas fa-fw fa-home"></i> Home](/README)
 	* [<i class="fas fa-fw fa-archive"></i> 基础篇](/basic/)
 * <i class="fas fa-fw fa-fan fa-spin"></i> Links
