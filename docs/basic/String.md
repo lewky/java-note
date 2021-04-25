@@ -1,6 +1,6 @@
 <!--
 date: 2021-03-27T23:48:12+08:00
-lastmod: 2021-04-15T23:48:12+08:00
+lastmod: 2021-04-24T23:48:12+08:00
 -->
 ## String的不可变
 
@@ -288,6 +288,13 @@ public class Version
 Redis的字符串就是二进制安全的。
 
 * [什么是二进制安全？](https://www.zhihu.com/question/24214241/answer/262778202)
+
+## 怎样将GB2312编码的字符串转换为ISO-8859-1编码的字符串？
+
+```java
+String s1 = "你好";
+String s2 = new String(s1.getBytes("GB2312"), "ISO-8859-1");
+```
 
 ## 参考链接
 
