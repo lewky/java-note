@@ -1,4 +1,4 @@
-![logo](https://docsify.js.org/_media/icon.svg)
+![logo](https://cdn.jsdelivr.net/gh/lewky/lewky.github.io@master/apple-touch-icon.png)
 
 # Java笔记
 
