@@ -1,6 +1,6 @@
 <!--
 date: 2021-03-27T23:48:12+08:00
-lastmod: 2021-04-24T23:48:12+08:00
+lastmod: 2021-05-04T23:48:12+08:00
 -->
 ## String的不可变
 
@@ -289,11 +289,39 @@ Redis的字符串就是二进制安全的。
 
 * [什么是二进制安全？](https://www.zhihu.com/question/24214241/answer/262778202)
 
-## 怎样将GB2312编码的字符串转换为ISO-8859-1编码的字符串？
+## 一些相关的题目
+
+### 怎样将GB2312编码的字符串转换为ISO-8859-1编码的字符串？
 
 ```java
 String s1 = "你好";
 String s2 = new String(s1.getBytes("GB2312"), "ISO-8859-1");
+```
+
+### 如何实现字符串的反转及替换？
+
+方法有很多，这里提供3种：
+1. 使用jdk自带的reverse()
+```java
+String str="abc";
+String result = new StringBuilder(str).reverse().toString();
+```
+2. 递归实现
+```java
+public static String reverse(String originStr) {
+    if(originStr == null || originStr.length() <= 1) 
+        return originStr;
+    return reverse(originStr.substring(1)) + originStr.charAt(0);
+}
+```
+3. 非递归实现
+```java
+String str="abc";
+StringBuilder temp = new StringBuilder();
+for (int i = str.length() - 1; i >= 0; i--) {
+	temp.append(str.charAt(i));
+}
+String result = temp.toString();
 ```
 
 ## 参考链接
