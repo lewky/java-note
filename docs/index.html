@@ -26,22 +26,54 @@
       coverpage: true,
 	  scrollToTop: {
         auto: true,
-        text: 'top',
+        text: '▲',
         right: 15,
         bottom: 15,
         offset: 300
-      }
+      },
+	  count:{
+		countable: true,
+		position: 'top',
+		margin: '10px',
+		float: 'right',
+		fontsize:'0.9em',
+		color:'rgb(90,90,90)',
+		language:'chinese',
+		localization: {
+		  words: "",
+		  minute: ""
+		},
+		isExpected: true
+	  }
     }
   </script>
   <!-- Docsify v4 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  <!-- 搜索 -->
   <script src="//cdn.bootcss.com/docsify/4.5.9/plugins/search.min.js"></script>
+  <!-- 回到顶部 -->
   <script src="//unpkg.com/docsify-scroll-to-top@1.0.2/dist/docsify-scroll-to-top.min.js"></script>
+  <!-- 代码格式 -->
   <script src="//cdn.jsdelivr.net/npm/prismjs@1.22.0/components/prism-java.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1.22.0/components/prism-bash.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1.22.0/components/prism-c.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1.22.0/components/prism-sql.min.js"></script>
+  <!-- 代码块复制 -->
   <script src="//unpkg.com/docsify-copy-code@2.1.1/dist/docsify-copy-code.min.js"></script>
+  <!-- 图片缩放 -->
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/zoom-image.min.js"></script>
+  <!-- 字数统计 -->
+  <script src="//unpkg.com/docsify-count/dist/countable.min.js"></script>
+  <!-- 百度统计 -->
+  <script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "https://hm.baidu.com/hm.js?3fc449c7c96417f382c533c3793d0a8b";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+  </script>
+
 </body>
 </html>
