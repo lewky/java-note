@@ -11,4 +11,6 @@
 * [异常](/basic/异常)
 * [泛型](/basic/泛型)
 * [注解](/basic/注解)
-* [新特性](/basic/新特性)
+* [新特性](#)
+	* [Java7新特性](/basic/Java7新特性)
+	* [Java8新特性](/basic/Java8新特性)

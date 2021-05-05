@@ -1,10 +1,10 @@
 <!--
 date: 2021-04-19T22:34:12+08:00
-lastmod: 2021-05-04T22:34:12+08:00
+lastmod: 2021-05-06T22:34:12+08:00
 -->
 ## Java7新特性（New highlights）
 
-### 二进制字面值（Binary Literals）
+## 二进制字面值（Binary Literals）
 
 整型类型（byte、char、short、int、long）可以用二进制字面量表示，使用二进制字面量时要加上`ob`或者`oB`前缀。相比十六进制`0x`，二进制字面量会更加直观。
 
@@ -13,7 +13,7 @@ byte a = 0b00000011;    // 3
 byte a2 = 0B00000011;   // 3    
 ```
 
-### 数值中支持_（Underscores in Numeric Literals）
+## 数值中支持_（Underscores in Numeric Literals）
 
 允许在数值字面量中添加`_`来提供可读性，但是以下四种情况是不允许添加`_`的：
 * 在数字的开头或结尾
@@ -41,13 +41,13 @@ int x9 = 0_52;
 int x10 = 05_2;
 ```
 
-###  switch支持String类型（Strings in Switch Statement）
+##  switch支持String类型（Strings in Switch Statement）
 
 Java7之前只支持char、byte、short、int、Character、Byte、Short、Integer、String、enum类型，从Java7开始，switch支持String，编译器会根据字符串的hashCode来处理。
 
 * [switch为什么可以支持 String？](http://localhost:3000/#/basic/%E8%BF%90%E7%AE%97?id=%e4%b8%ba%e4%bb%80%e4%b9%88%e5%8f%af%e4%bb%a5%e6%94%af%e6%8c%81-string%ef%bc%9f)
 
-### 推断泛型类型参数（Type Inference for Generic Instance Creation，也叫Diamond Syntax）
+## 推断泛型类型参数（Type Inference for Generic Instance Creation，也叫Diamond Syntax）
 
 只要编译器可以从上下文中推断出类型参数，就可以用一对空着的尖括号`<>`来代替泛型参数。因为缩短的尖括号看起来像钻石，所以又叫钻石语法（Diamond Syntax）：
 
@@ -64,7 +64,7 @@ Map<String, List<String>> myMap = new HashMap<String, List<String>>();
 looks like a diamond. The proper name in the proposal is “Improved Type Inference
 for Generic Instance Creation,” which is a real mouthful and has ITIGIC as an acronym, which sounds stupid, so diamond syntax it is.
 
-### try语句可以附带资源声明try-with-resources
+## try语句可以附带资源声明try-with-resources
 
 一般在使用try-catch语句块时，会在finally块里释放资源，比如关闭数据库连接等。Java7提供了带资源声明的try语句，这样就无需在finally块里释放声明了的资源，无论是否发生异常，JVM会自动帮你释放资源。此外，在关闭资源时往往也需要再次try-catch，代码较为冗余。
 
@@ -106,7 +106,7 @@ public String after(String path) {
 }
 ```
 
-### 新增addSuppressed异常方法
+## 新增addSuppressed异常方法
 
 有时候在finally块的语句会抛出异常，如果没有处理就会把原本发生的异常覆盖掉，在异常的顶级类`Throwable`中新增了`addSuppressed`方法，允许记录另一个异常，可以通过`getSuppressed`方法来获取这个被记录的异常。这两个方法都是线程安全的，且`addSuppressed`方法会自动被`try-with-resources`所调用。
 
@@ -138,7 +138,7 @@ public String after(String path) {
 }
 ```
 
-### 捕获多个异常（Catching Multiple Exception Types）
+## 捕获多个异常（Catching Multiple Exception Types）
 
 一个catch块可以捕获多个异常，多个异常之间用`|`分隔。
 
@@ -173,7 +173,7 @@ public void after() {
 
 **注意，如果一个catch处理了多个异常，那么这个catch的参数默认就是final的，不能在catch块里修改它的值。 另外，用一个catch处理多个异常，比用多个catch块处理异常生成的字节码要更小更高效。**
 
-### 增加类型检查后的重抛 （Rethrowing Exceptions with Improved Type Checking）
+## 增加类型检查后的重抛 （Rethrowing Exceptions with Improved Type Checking）
 
 `throws`声明异常抛出时可以抛出更加具体的异常类型，在Java1.7之前只能声明抛出`Excetpion`。
 
@@ -200,55 +200,13 @@ public void after() throws RuntimeException, IOException {
     }
 }
 ```
-### 其他的一些新特性
+
+## 其他的一些新特性
 
 * 支持在JVM上运行动态类型语言，在字节码层面支持了`InvokeDynamic`（Support for Dynamic Languages）
 * 提供了新的I/O API（Java nio Package）
 	* [nio](/io/nio)
 * 逐渐去永久代化，字符串常量池和静态变量被转移到堆中。
-
-## Java8新特性
-
-Java8新增了很多新特性，这里只介绍比较重要的几个新特性。
-
-### Lambda表达式(Lambda Expressions)
-
-
-### 方法引用（Method Reference）
-
-
-### 默认方法（Default Methods）
-
-
-### 集合的Stream API（Streams）
-
-
-### 新的日期和时间API（Date and Time API）
-
-
-### Optional容器类
-
-
-### 类型注解（Type Annotations）
-
-新增类型注解，类型注解无法作用于返回值是void的方法。
-
-* [类型注解](/basic/%E6%B3%A8%E8%A7%A3?id=%e7%b1%bb%e5%9e%8b%e6%b3%a8%e8%a7%a3)
-
-
-### 并行操作（Parallel operations）
-
-
-### 提升HashMaps的性能
-
-
-
-### 其他的一些新特性
-
-* Nashhorn JavaScript引擎（Nashhorn JavaScript Engine）
-	* [Java 8 Nashorn JavaScript](https://www.runoob.com/java/java8-nashorn-javascript.html) 
-* 新的并发工具（Concurrent Accumulators）
-* 取消永久代，但是新增了本地内存的元空间Metaspace，用以保存类型信息、字段、方法、常量
 
 ## 参考链接
 
@@ -256,5 +214,3 @@ Java8新增了很多新特性，这里只介绍比较重要的几个新特性。
 * [Java SE 7新增特效](https://blog.csdn.net/u012104435/article/details/50971374)
 * [Java7的新特性](https://segmentfault.com/a/1190000004417830)
 * [Java 避免异常屏蔽 - addSuppressed](https://www.cnblogs.com/hbbbs/articles/11868942.html)
-* [Java 8 新特性](https://www.runoob.com/java/java8-new-features.html)
-* [Java8的新特性](https://segmentfault.com/a/1190000004419611)
