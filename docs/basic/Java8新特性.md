@@ -1,6 +1,6 @@
 <!--
 date: 2021-04-19T22:34:12+08:00
-lastmod: 2021-05-06T22:34:12+08:00
+lastmod: 2021-05-07T22:34:12+08:00
 -->
 ## Java8新特性
 
@@ -19,7 +19,7 @@ Lambda表达式语法格式如下：
 ```
 
 * 可选类型声明：不需要声明参数类型，编译器可以统一识别参数值。
-* 可选的参数圆括号：一个参数无需定义圆括号，但多个参数需要定义圆括号。
+* 可选的参数圆括号：一个参数无需定义圆括号，但多个参数需要定义圆括号，没有参数时也要定义一个圆括号。
 * 可选的大括号：如果主体包含了一个语句，就不需要使用大括号，此时不能在语句末尾使用分号（此时是作为表达式，而不是一个完整的语句）。反过来说，如果使用了大括号，则必须在语句末尾使用分号。
 可选的返回关键字：如果主体只有一个表达式返回值则编译器会自动返回值，大括号需要指定明表达式返回了一个数值。
 
@@ -52,14 +52,78 @@ public class Test {
 ```
 
 **注意：**
-* Lambda表达式相当于简写了实现接口的匿名内部类，但是被实现的接口只能有一个没有实现的方法，这种接口被称为函数式接口（Functional Interface）
-* 可以在接口上添加`@FunctionalInterface`来表明一个函数式接口，这样编译器会帮你自动检查当前接口是否只有一个没有实现的方法
+* Lambda表达式相当于简写了实现接口的匿名内部类，但是被实现的接口只能有一个抽象方法，这种接口被称为函数式接口（Functional Interface）
+* 可以在接口上添加`@FunctionalInterface`来表明一个函数式接口，这样编译器会帮你自动检查当前接口是否只有一个抽象方法
 * Lambda表达式如果需要访问**外部局部变量**，则该局部变量必须是final的或者effectively final的，因为Lambda表达式本质上就是一个只存在于内存中的匿名内部类。
 	* [为什么局部内部类和匿名内部类只能访问局部final变量](/basic/关键字?id=为什么局部内部类和匿名内部类只能访问局部final变量)
 * Lambda表达式当中不允许声明一个与局部变量同名的参数或者局部变量，原因同上。
 
 ## 方法引用（Method Reference）
 
+方法引用就是通过方法的名字来指向一个方法，是对Lambda表达式的进一步简写。但不是所有的Lambda表达式都能简写为方法引用，需要满足三个条件：
+* 方法引用本质也是为了简写匿名内部类，被它实现的接口中的抽象方法的形参列表和返回值类型，要与方法引用的方法的形参列表和返回值类型相同
+* 方法参数不能被Lambda表达式改动，必须原封不动地作为参数被传递给另一个方法
+* Lambda表达式只有一行语句
+
+方法引用使用双冒号`::`表示，一共有以下几种用法：
+
+```java
+public class Test extends Father {
+
+    interface TestMethodReference {
+        void test();
+    }
+
+    void notStaticMethod() {
+
+    }
+
+    static void staticMethod() {
+
+    }
+
+    protected void test() {
+        // 构造器引用
+        TestMethodReference test = Test::new;
+        test = ArrayList<Test>::new;
+
+        // 数组构造器引用，Function是Java8提供的一个函数式接口
+        Function<Integer, Test[]> function = Test[]::new;
+
+        // 静态方法引用
+        test = System.out::println;
+        test = Test::staticMethod;
+
+        // 特定类的任意对象的实例方法引用
+        ArrayList<Test> list = new ArrayList<>();
+        list.forEach(Test::notStaticMethod);
+
+        // 特定对象的实例方法引用
+        Test instance = new Test();
+        test = instance::notStaticMethod;
+
+        // 超类上的实例方法引用
+        test = super::notStaticFatherMethod;
+
+        // 编译报错，但奇怪的是Lambda表达式却不会报错
+        test = super::staticFatherMethod;  // The method staticFatherMethod() from the type Father should be accessed in a static way
+        test = () -> super.staticFatherMethod();
+
+    }
+
+}
+
+class Father {
+
+    protected void notStaticFatherMethod() {
+
+    }
+
+    protected static void staticFatherMethod() {
+
+    }
+}
+```
 
 ## 默认方法（Default Methods）
 
