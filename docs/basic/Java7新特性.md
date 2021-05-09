@@ -1,6 +1,6 @@
 <!--
 date: 2021-04-19T22:34:12+08:00
-lastmod: 2021-05-06T22:34:12+08:00
+lastmod: 2021-05-09T22:34:12+08:00
 -->
 ## Java7新特性（New highlights）
 
@@ -207,6 +207,7 @@ public void after() throws RuntimeException, IOException {
 * 提供了新的I/O API（Java nio Package）
 	* [nio](/io/nio)
 * 逐渐去永久代化，字符串常量池和静态变量被转移到堆中。
+* 提供了ForkJoin框架，用于提供并行执行任务，是一个把大任务分割成若干个小任务，最终汇总每个小任务结果后得到大任务结果的框架。（Java8的parallelStream跟这个框架有关）
 
 ## 参考链接
 
