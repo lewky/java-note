@@ -1,6 +1,6 @@
 <!--
 date: 2021-04-19T22:34:12+08:00
-lastmod: 2021-05-09T22:34:12+08:00
+lastmod: 2021-05-10T22:34:12+08:00
 -->
 ## Java8新特性
 
@@ -170,17 +170,122 @@ interface TestDefault {
 
 集合框架提供了一种新的处理元素的Stream API，将需要被处理的集合看作一种流，流在管道中传输，并可以在管道的节点上进行处理，比如过滤、排序、聚合等。
 
-元素流在管道中经过中间操作（intermediate operation）的处理，最后由最终操作(terminal operation)得到前面处理的结果。
+元素流在管道中经过中间操作（intermediate operation）的处理，最后由最终操作(terminal operation)得到前面处理的结果。中间操作是惰性的（lazy），每个中间操作会返回一个新的流，一个流可以跟着若干个中间操作。中间操作不会真的去遍历集合，只有遇到最终操作才会开始真正的遍历集合开始计算。并且流只能有一个最终操作，经过最终操作后流中的元素就被用完了，会返回计算的结果（也可能返回的是void）。
+
+注意，Stream流属于管道流，只能被消费一次。一个Stream流经过一次中间操作后，数据就被转移到下一个流，原本的流就会关闭。一个流只能被操作一次，重复操作同一个流会抛异常`java.lang.IllegalStateException: stream has already been operated upon or closed`。这也是为什么每个中间操作都会返回新的流对象，同时也便于链式调用。
 
 Stream的数据源除了可以是集合外，也可以是数组，I/O channel，产生器generator等。平时集合用的比较多，这里只简单介绍下集合的Stream API。
 
 集合在Java8之前通过Iterator或者For-Each的方式，显示地在集合外部进行迭代。而Stream提供了内部迭代的方式，通过访问者模式（Visitor）实现。
 
-### 串行流和并行流
+### 生成流
 
 有两种方式生成流：
-* `stream()`生成串行流
-* `parallelStream()`生成并行流
+* `stream()`生成串行流，用于串行处理操作
+* `parallelStream()`生成并行流，用于并行处理操作
+
+### forEach
+
+集合的Stream提供了新的内部迭代方式forEach，这是一个最终操作：
+
+```java
+public static void main(final String[] args) throws CloneNotSupportedException {
+    final List<String> list = Arrays.asList("a", "b", "c");
+    Consumer<String> consumer = System.out::println;
+    consumer = consumer.andThen(string -> { string = string + string; System.out.println(string); });
+    list.stream().forEach(consumer);
+}
+```
+
+输出如下：
+
+```java
+a
+aa
+b
+bb
+c
+cc
+```
+
+### map、flatMap
+
+map将Stream中元素映射为另一个元素，原本有多少个元素，返回的流中就有多少个元素。比如说原本元素是`Stream<T>`，那么map会返回`Stream<R>`。
+
+flatMap则是将Stream的元素压缩到同一个Stream中，并且只有当Stream中元素是一个Stream时才能使用。原本的元素都是Stream，Stream中又有元素，flatMap会把里面的元素都拿出来，一起装到一个新的Stream并返回。比如说原本元素是`Stream<Stream<T>>`，那么flatMap会返回`Stream<R>`。如果原本元素是`Stream<Stream<Stream<T>>>`，那么flatMap会返回`Stream<Stream<R>>`。
+
+```java
+public static void main(final String[] args) throws CloneNotSupportedException {
+    final List<String> list = Arrays.asList("a", "b", "c");
+    // map
+    list.stream()
+        .map(each -> each + each)
+        .forEach(System.out::println);
+
+    // flatMap
+    list.stream()
+        .map(each -> Stream.of(each))
+        .flatMap(each -> each)
+        .forEach(System.out::println);
+}
+```
+
+结果如下：
+
+```java
+aa
+bb
+cc
+a
+b
+c
+```
+
+### filter
+
+用于过滤元素，当条件为true时才能被保留下来。
+
+```java
+public static void main(final String[] args) throws CloneNotSupportedException {
+    final List<String> list = Arrays.asList("a", "b", "c");
+    list.stream()
+        .filter(each -> "a".equals(each))
+        .forEach(System.out::println);
+    // result: a
+}
+```
+
+### limit
+
+用于获取指定数量的流：
+
+```java
+new Random().ints().limit(3).forEach(System.out::println);
+
+List<String> list = Arrays.asList("a", "b", "c");
+list.stream()
+    .limit(2)
+    .forEach(System.out::print);
+// result: ab
+```
+
+### sorted
+
+对流元素进行顺序排序：
+
+```java
+list.stream().sorted().forEach(System.out::print);
+// result: 239
+
+list.stream()
+    .sorted((a, b) -> b - a)
+    .forEach(System.out::print);
+// result: 932
+```
+
+### 并行操作
+
+通过`parallelStream()`进行并行处理操作：
 
 ```java
 public class Test {
@@ -285,26 +390,39 @@ parallelStream使用了Java7引入的并行执行框架`ForkJoin`和`ForkJoinPoo
 也可以通过设置启动参数`java.util.concurrent.ForkJoinPool.common.parallelism`来控制parallelism的值。ForkJoinPool的最大并行线程数量等于`parallelism + 1`。
 
 >* 使用parallelStream可以简洁高效的写出并发代码。
-* parallelStream并行执行是无序的。
-* parallelStream提供了更简单的并发执行的实现，但并不意味着更高的性能，它是使用要根据具体的应用场景。如果cpu资源紧张parallelStream不会带来性能提升；如果存在频繁的线程切换反而会降低性能。
-* 任务之间最好是状态无关的，因为**parallelStream默认是非线程安全的**，可能带来结果的不确定性。
-
-### forEach
-
-
-### map、flatMap
-
-
-### filter
-
-### limit
-
-
-### sorted
-
+>* parallelStream并行执行是无序的。
+>* parallelStream提供了更简单的并发执行的实现，但并不意味着更高的性能，它是使用要根据具体的应用场景。如果cpu资源紧张parallelStream不会带来性能提升；如果存在频繁的线程切换反而会降低性能。
+>* 任务之间最好是状态无关的，因为**parallelStream默认是非线程安全的**，可能带来结果的不确定性。
 
 ### Collectors
 
+Collectors工具类提供了各种归约操作，可以将流转换为集合和聚合元素，常用的有将流转换为集合、String等操作。
+
+```java
+List<String> list = Arrays.asList("a", "b", "cc");
+// 返回ArrayList
+List<String> collect = list.stream().filter(each -> each.length() > 1).collect(Collectors.toList());
+System.out.println(collect instanceof ArrayList);   // true
+
+// 返回一个String
+String string = list.stream().collect(Collectors.joining());
+System.out.println(string);  // abcc
+```
+
+### 统计
+
+除了常规的Stream外，还提供了各种包装类的Stream：IntStream、LongStream、DoubleStream。它们和Stream一样，都继承自BaseStream接口，但是额外提供了普通Stream没有的统计聚合功能。
+
+```java
+List<Integer> list = Arrays.asList(5, 29, 1, 42, 87, 19);
+
+IntSummaryStatistics stat = list.stream().mapToInt(each -> each).summaryStatistics();
+System.out.println(stat.getCount());    // 6
+System.out.println(stat.getAverage());  // 30.5
+System.out.println(stat.getMax());      // 87
+System.out.println(stat.getMin());      // 1
+System.out.println(stat.getSum());      // 183
+```
 
 ## 新的日期和时间API（Date and Time API）
 
@@ -340,3 +458,4 @@ parallelStream使用了Java7引入的并行执行框架`ForkJoin`和`ForkJoinPoo
 * [Java 8 方法引用](https://www.runoob.com/java/java8-method-references.html)
 * [Java 8 默认方法](https://www.runoob.com/java/java8-default-methods.html)
 * [Java8 parallelStream浅析](https://zhuanlan.zhihu.com/p/43039062)
+* [Java 8 Stream](https://www.runoob.com/java/java8-streams.html)
