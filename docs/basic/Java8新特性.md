@@ -1,6 +1,6 @@
 <!--
 date: 2021-04-19T22:34:12+08:00
-lastmod: 2021-05-10T22:34:12+08:00
+lastmod: 2021-05-11T22:34:12+08:00
 -->
 ## Java8新特性
 
@@ -170,7 +170,7 @@ interface TestDefault {
 
 集合框架提供了一种新的处理元素的Stream API，将需要被处理的集合看作一种流，流在管道中传输，并可以在管道的节点上进行处理，比如过滤、排序、聚合等。
 
-元素流在管道中经过中间操作（intermediate operation）的处理，最后由最终操作(terminal operation)得到前面处理的结果。中间操作是惰性的（lazy），每个中间操作会返回一个新的流，一个流可以跟着若干个中间操作。中间操作不会真的去遍历集合，只有遇到最终操作才会开始真正的遍历集合开始计算。并且流只能有一个最终操作，经过最终操作后流中的元素就被用完了，会返回计算的结果（也可能返回的是void）。
+元素流在管道中经过中间操作（intermediate operation）的处理，最后由最终操作(terminal operation)得到前面处理的结果。中间操作是惰性的（lazy），每个中间操作都会返回一个新的流。中间操作不会真的去遍历集合，只有遇到最终操作才会开始真正的遍历集合执行计算。一个流可以经过若干个中间操作，但只能有一个最终操作，经过最终操作后流中的元素就被用完了，会返回计算的结果（也可能返回的是void）。
 
 注意，Stream流属于管道流，只能被消费一次。一个Stream流经过一次中间操作后，数据就被转移到下一个流，原本的流就会关闭。一个流只能被操作一次，重复操作同一个流会抛异常`java.lang.IllegalStateException: stream has already been operated upon or closed`。这也是为什么每个中间操作都会返回新的流对象，同时也便于链式调用。
 
@@ -396,7 +396,7 @@ parallelStream使用了Java7引入的并行执行框架`ForkJoin`和`ForkJoinPoo
 
 ### Collectors
 
-Collectors工具类提供了各种归约操作，可以将流转换为集合和聚合元素，常用的有将流转换为集合、String等操作。
+Collectors工具类提供了各种归约操作，可以将流转换为集合和聚合元素，这是一个最终操作，常用的有将流转换为集合、String等操作。
 
 ```java
 List<String> list = Arrays.asList("a", "b", "cc");
@@ -407,6 +407,54 @@ System.out.println(collect instanceof ArrayList);   // true
 // 返回一个String
 String string = list.stream().collect(Collectors.joining());
 System.out.println(string);  // abcc
+```
+
+### reduce
+
+这里的reduce不是减少的意思，而是归纳、归约的意思，是一个最终操作，用于累计运算（迭代运算器）。
+
+```java
+List<Integer> list = Arrays.asList(1, 2, 3, 4, 5);
+// 3 + (1 + 2 + 3 + 4 + 5) = 18
+Integer result = list.stream().reduce(3, (a, b) -> a + b);
+// 1 + 2 + 3 + 4 + 5 = 15
+result = list.stream().reduce((a, b) -> a + b).get();
+```
+
+### peek
+
+peek类似于forEach，但peek是一个中间操作。peek接收的是一个Consumer接口，用来对元素进行操作，且没有返回值，这意味着peek不会改变原本的元素，这是peek的map的区别。
+
+所以peek可以用于debug，用来输出元素的信息，当然也可以直接改变元素内部的属性。
+
+```java
+public class Test {
+
+    int seq;
+
+    public Test(int seq) {
+        this.seq = seq;
+    }
+
+    public void setSeq(int seq) {
+        this.seq = seq;
+    }
+
+    public int getSeq() {
+        return seq;
+    }
+
+    public static void main(String[] args) throws Exception {
+        List<String> list = Arrays.asList("a", "b", "c");
+        // result: abc
+        list.stream().peek(each -> each.toUpperCase()).forEach(System.out::print);
+
+        List<Test> list2 = Arrays.asList(new Test(1));
+        // result: 10
+        list2.stream().peek(each -> each.setSeq(10)).map(Test::getSeq).forEach(System.out::print);
+    }
+
+}
 ```
 
 ### 统计
@@ -424,11 +472,65 @@ System.out.println(stat.getMin());      // 1
 System.out.println(stat.getSum());      // 183
 ```
 
+### 用Stream实现斐波那契数列
+
+`iterate`和`generate`都可以生成无限流，这里用的前者：
+
+```java
+String result = Stream.iterate(new int[] {0, 1}, array -> new int[] {array[1], array[0] + array[1]})
+    .limit(10)
+    .map(each -> String.valueOf(each[0]))
+    .reduce((a, b) -> a + ", " + b).orElse("");
+System.out.println(result);
+// result: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34
+```
+
 ## 新的日期和时间API（Date and Time API）
 
+旧版本的日期API存在以下问题：
+>* **非线程安全。**所有日期类都是可变的，这是Java日期类最大的问题之一。
+>* **设计很差。**在`java.util`和`java.sql`的包中都有Date类，前者同时包含日期和时间，后者仅包含日期。用于格式化和解析的类则定义在`java.text`包中。
+>* **时区处理麻烦。**日期类并不提供国际化，没有时区支持，因此Java引入了`java.util.Calendar`和`java.util.TimeZone`类，但他们同样存在上述所有的问题。
+
+Java8在`java.time`包提供了新的日期API：
+>* **Local本地日期**：简化了日期时间的处理，没有时区的问题。
+>* **Zoned时区日期**：通过指定的时区处理日期时间。
+
+### 本地日期API
+
+在不需要处理时区时使用：LocalDate、LocalTime、LocalDateTime
+
+```java
+
+```
+
+### 时区日期API
+
+```java
+
+```
 
 ## Optional容器类
 
+Optional是一个容器对象，内部最多存放一个元素，元素允许为null。Optional类的目的是尽可能减少系统中的NullPointerException。
+
+```java
+// of方法不允许参数为null，否则抛出NPE
+Optional<String> optional = Optional.of("test");
+// ofNullable允许参数为null，此时返回一个空的Optional对象
+optional = Optional.ofNullable(null);
+// 获取一个值为null的空容器
+optional = Optional.empty();
+
+// 是否存在值
+System.out.println(optional.isPresent());   // false
+// 返回容器中的值，如果值是null则返回指定的值
+System.out.println(optional.orElse("test"));    // test
+// 返回容器中的值，如果值是null则抛出NoSuchElementException
+System.out.println(optional.get());
+// 返回容器中的值，如果值是null则抛出指定的异常
+System.out.println(optional.orElseThrow(RuntimeException::new));
+```
 
 ## 类型注解（Type Annotations）
 
@@ -454,8 +556,5 @@ System.out.println(stat.getSum());      // 183
 
 * [Java 8 新特性](https://www.runoob.com/java/java8-new-features.html)
 * [Java8的新特性](https://segmentfault.com/a/1190000004419611)
-* [Java Lambda 表达式](https://www.runoob.com/java/java8-lambda-expressions.html)
-* [Java 8 方法引用](https://www.runoob.com/java/java8-method-references.html)
-* [Java 8 默认方法](https://www.runoob.com/java/java8-default-methods.html)
 * [Java8 parallelStream浅析](https://zhuanlan.zhihu.com/p/43039062)
-* [Java 8 Stream](https://www.runoob.com/java/java8-streams.html)
+* [Stream流实现斐波那契数列](https://www.cnblogs.com/lishuaiqi/p/12006292.html)
