@@ -1,6 +1,6 @@
 <!--
 date: 2021-04-19T22:34:12+08:00
-lastmod: 2021-05-11T22:34:12+08:00
+lastmod: 2021-05-12T22:34:12+08:00
 -->
 ## Java8新特性
 
@@ -394,6 +394,10 @@ parallelStream使用了Java7引入的并行执行框架`ForkJoin`和`ForkJoinPoo
 >* parallelStream提供了更简单的并发执行的实现，但并不意味着更高的性能，它是使用要根据具体的应用场景。如果cpu资源紧张parallelStream不会带来性能提升；如果存在频繁的线程切换反而会降低性能。
 >* 任务之间最好是状态无关的，因为**parallelStream默认是非线程安全的**，可能带来结果的不确定性。
 
+此外，还可以通过`stream().parallel()`来将顺序流切换成并行流。
+
+* [java - parallelStream vs stream.parallel - Stack Overflow](https://stackoverflow.com/questions/43811182/parallelstream-vs-stream-parallel)
+
 ### Collectors
 
 Collectors工具类提供了各种归约操作，可以将流转换为集合和聚合元素，这是一个最终操作，常用的有将流转换为集合、String等操作。
@@ -498,16 +502,53 @@ Java8在`java.time`包提供了新的日期API：
 
 ### 本地日期API
 
-在不需要处理时区时使用：LocalDate、LocalTime、LocalDateTime
+在不需要处理时区时使用：LocalDate、LocalTime、LocalDateTime，也就是获取系统默认时区的日期时间。
 
 ```java
+// 本地日期
+LocalDate localDate = LocalDate.now();
+System.out.println(localDate);  // 2021-05-12
+System.out.println(localDate.getYear());  // 2021
+System.out.println(localDate.getMonthValue());  // 5
+System.out.println(localDate.getDayOfMonth());  // 12
+System.out.println(localDate.withYear(2017).withMonth(7).withDayOfMonth(1));  // 2017-07-01
 
+// 本地时间
+LocalTime localTime = LocalTime.now();
+System.out.println(localTime);  // 00:13:19.738
+System.out.println(localTime.getHour());  // 0
+System.out.println(localTime.plusHours(1)); // 01:13:19.738
+
+// 本地日期时间
+LocalDateTime localDateTime = LocalDateTime.now();
+System.out.println(localDateTime);  // 2021-05-12T00:13:19.738
+System.out.println(localDateTime.toLocalDate());    // 2021-05-12
+System.out.println(localDateTime.toLocalTime());    // 00:13:19.738
+System.out.println(localDateTime.getHour());    // 0
+
+// 指定日期
+System.out.println(LocalDate.of(2017, 7, 1));   // 2017-07-01
+System.out.println(LocalTime.of(0, 0));     // 00:00
+
+// 解析日期字符串
+System.out.println(LocalTime.parse("20:15:30"));    // 20:15:30
 ```
 
 ### 时区日期API
 
-```java
+时区日期类是ZonedDateTime：
 
+```java
+// 时区日期时间
+ZonedDateTime zonedDateTime = ZonedDateTime.now();
+System.out.println(zonedDateTime);  // 2021-05-12T08:22:21.404+08:00[Asia/Shanghai]
+
+System.out.println(zonedDateTime.getYear());    // 2021
+System.out.println(zonedDateTime.getOffset());  // +08:00
+System.out.println(zonedDateTime.getZone());    // Asia/Shanghai
+
+System.out.println(ZoneId.systemDefault());     // Asia/Shanghai
+System.out.println(ZoneId.SHORT_IDS.get("CTT"));// Asia/Shanghai
 ```
 
 ## Optional容器类
@@ -538,18 +579,49 @@ System.out.println(optional.orElseThrow(RuntimeException::new));
 
 * [类型注解](/basic/%E6%B3%A8%E8%A7%A3?id=%e7%b1%bb%e5%9e%8b%e6%b3%a8%e8%a7%a3)
 
-## 并行操作（Parallel operations）
+## Base64
 
+Java8中Base64编码已经成为Java类库的标准，提供了三种类型的编码解码器：
+* 基本：输出被映射到一组字符`A-Za-z0-9+/`，编码不添加任何行标，输出的解码仅支持`A-Za-z0-9+/`。
+* URL：输出映射到一组字符`A-Za-z0-9+_`，输出是URL和文件。
+* MIME：输出隐射到MIME友好格式。输出每行不超过76字符，并且使用`\r`并跟随`\n`作为分割。编码输出最后没有行分割。
+
+```java
+String string = "https://javanote.doc.lewky.cn/";
+// 基本编码
+String encodeToString = Base64.getEncoder().encodeToString(string.getBytes("utf-8"));
+System.out.println(encodeToString);  // aHR0cHM6Ly9qYXZhbm90ZS5kb2MubGV3a3kuY24v
+// 基本解码
+byte[] decode = Base64.getDecoder().decode(encodeToString);
+String result = new String(decode, "utf-8");
+System.out.println(result);  // https://javanote.doc.lewky.cn/
+
+// URL编码
+encodeToString = Base64.getUrlEncoder().encodeToString(string.getBytes("utf-8"));
+System.out.println(encodeToString);  // aHR0cHM6Ly9qYXZhbm90ZS5kb2MubGV3a3kuY24v
+// URL解码
+decode = Base64.getUrlDecoder().decode(encodeToString);
+result = new String(decode, "utf-8");
+System.out.println(result);  // https://javanote.doc.lewky.cn/
+
+// MIME编码
+encodeToString = Base64.getMimeEncoder().encodeToString(string.getBytes("utf-8"));
+System.out.println(encodeToString);  // aHR0cHM6Ly9qYXZhbm90ZS5kb2MubGV3a3kuY24v
+// MIME解码
+decode = Base64.getMimeDecoder().decode(encodeToString);
+result = new String(decode, "utf-8");
+System.out.println(result);  // https://javanote.doc.lewky.cn/
+```
 
 ## 提升HashMaps的性能
 
-
+>当hash冲突时，以前都是用链表存储，在java8里头，当节点个数>=TREEIFY_THRESHOLD - 1时，HashMap将采用红黑树存储，这样最坏的情况下即所有的key都Hash冲突，采用链表的话查找时间为O(n)，而采用红黑树为O(logn)。
 
 ## 其他的一些新特性
 
 * Nashhorn JavaScript引擎（Nashhorn JavaScript Engine）
 	* [Java 8 Nashorn JavaScript](https://www.runoob.com/java/java8-nashorn-javascript.html) 
-* 新的并发工具（Concurrent Accumulators）
+* 新的并发工具类StampedLock
 * 取消永久代，但是新增了本地内存的元空间Metaspace，用以保存类型信息、字段、方法、常量
 
 ## 参考链接
