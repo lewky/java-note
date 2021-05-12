@@ -387,7 +387,7 @@ parallelStream cost:109
 
 parallelStream使用了Java7引入的并行执行框架`ForkJoin`和`ForkJoinPool`，ForkJoinPool维护了一个静态的通用线程池`static final ForkJoinPool common`。该线程池有一个`parallelism`变量，如果不手动设置该值，则默认等于运行计算机上的逻辑处理器数量-1。比如系统CPU是6核12线程，那么默认值就是11，该数量可以用`Runtime.getRuntime().availableProcessors()`获取。
 
-也可以通过设置启动参数`java.util.concurrent.ForkJoinPool.common.parallelism`来控制parallelism的值。ForkJoinPool的最大并行线程数量等于`parallelism + 1`。
+也可以通过设置启动参数`java.util.concurrent.ForkJoinPool.common.parallelism`来控制parallelism的值。ForkJoinPool的最大并行线程数量等于`parallelism + 1`。**注意，并行度parallelism和通用线程池common都是final的，在初始化之后就不能更改了。**
 
 >* 使用parallelStream可以简洁高效的写出并发代码。
 >* parallelStream并行执行是无序的。
@@ -487,6 +487,24 @@ String result = Stream.iterate(new int[] {0, 1}, array -> new int[] {array[1], a
     .reduce((a, b) -> a + ", " + b).orElse("");
 System.out.println(result);
 // result: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34
+```
+
+## 并行操作（Parallel operations）
+
+除了并行流parallelStream之外，Arrays工具类也提供了并行操作：
+
+```java
+// 并行排序
+Arrays.parallelSort(array);
+System.out.println(Arrays.toString(array));  // [3, 7, 9, 22, 81]
+
+// 并行累计器
+Arrays.parallelPrefix(array, (a, b) -> a + b);
+System.out.println(Arrays.toString(array));  // [3, 10, 19, 41, 122]
+
+// 并行Set，相当于paralleStream的map
+Arrays.parallelSetAll(array, a -> array[a] + 1);
+System.out.println(Arrays.toString(array));  // [4, 11, 20, 42, 123]
 ```
 
 ## 新的日期和时间API（Date and Time API）
