@@ -9,6 +9,45 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css">
   <link rel="icon" href="//cdn.jsdelivr.net/gh/lewky/lewky.github.io@master/images/avatar.jpg">
   <link rel="stylesheet" href="/vue.css">
+  <style>
+	/* 首页一级标题 */
+	.markdown-section h1 a {
+	  color: #34495e !important;
+	}
+
+	/* 首页目录 */
+/*	.markdown-section li {
+	  line-height: 2rem !important;
+      font-size: 1.2em !important;
+	}*/
+
+	/* nav二级目录 */
+    nav li ul {
+	  text-align: center !important;
+	}
+
+	nav li li a {
+	  position: relative;
+	}
+
+	nav li li a::before {
+	  content: '';
+	  position: absolute;
+	  bottom: 0;
+	  left: 0;
+	  right: 0;
+	  height: 2px;
+	  background-color: #42b983;
+	  transform-origin: bottom right;
+	  transform: scaleX(0);
+	  transition: transform 0.5s ease;
+	}
+
+	nav li li a:hover::before {
+	  transform-origin: bottom left;
+	  transform: scaleX(1);
+	}
+  </style>
 </head>
 <body>
   <div id="app"></div>

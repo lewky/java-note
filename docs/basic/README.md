@@ -1,4 +1,4 @@
-# [☕️ Java笔记](/README)
+# [☕️ Java](/README)
 
 ## [基础篇](/basic/)
 
