@@ -1,6 +1,6 @@
 <!--
 date: 2021-03-27T23:48:12+08:00
-lastmod: 2021-05-04T23:48:12+08:00
+lastmod: 2021-05-18T23:48:12+08:00
 -->
 ## String的不可变
 
@@ -36,30 +36,31 @@ private final byte coder;
 char占据两个字节，byte占据一个字节。对于char，如果存储的字符串是LATIN1编码(即ISO-8859-1)，那么就只需要一个字节，高位的空间其实浪费了。所以在jdk1.9中，通过byte数组和coder编码来存储字符串，可以在使用单字节编码时(WINDOWS-1252、ISO-8859-1、UTF-8)起到节省空间的作用。
 
 coder变量只有两个值：0和1。
-* 0 代表Latin-1（单字节编码）
-* 1 代表 UTF-16 编码（双字节编码）
+
+● 0 代表Latin-1（单字节编码）<br>
+● 1 代表 UTF-16 编码（双字节编码）
 
 * [Java9 后String 为什么使用byte[]而不是char?](https://www.jianshu.com/p/9043243df546)
 
 ### 为什么String不可变
 
-1. 可以存储于字符串常量池（String Pool）。
+Ⅰ. 可以存储于字符串常量池（String Pool）。
 
 只有当String是不可变的，才能确保从字符串常量池中获取到的字符串引用不会指向一个错误的字符串对象（防止String的值被修改）。
 
-2. 方便缓存hashcode。
+Ⅱ. 方便缓存hashcode。
 
 因为String的不可变，可以保证hash也不会改变，只需要计算一次hash即可。虽然hash可以标识一个String对象，但是并不能单纯拿hash来对比两个String是否相等。hash值存在碰撞的可能，但是可以快速定位数据，缩小需要查找的数据范围。比如从jdk1.7开始switch支持String类型，就是用了hash + equals来实现的。
 
-3. 辅助其它对象的使用。
+Ⅲ. 辅助其它对象的使用。
 
 比如在一个HashSet中存储String对象，只有String是不可变的，才能确保不会违反Set中元素不重复的设计。
 
-4. 安全性。
+Ⅳ. 安全性。
 
 String经常作为方法参数来传递，String的不可变性可以保证参数的不可变。比如说作为网络连接、账号密码等参数，如果String的值是可变的，就可能导致上下文值不相同的情况，可能导致系统安全性的问题。
 
-5. 线程安全。
+Ⅴ. 线程安全。
 
 不可变对象是天然的线程安全的，可以在多线程中安全地使用。
 
@@ -83,9 +84,9 @@ public int hashCode() {
 }
 ```
 
-1. 31是一个奇质数，使用质数作为乘子可以得到比较好的均匀分布区间，更好地降低哈希算法的冲突率。这是学者们经过大量计算得出的一个结论。
-2. 31占据5个bit，使用比31小的质数，得出的hash值较小，较容易产生冲突。使用比31大的质数，则容易发生运算溢出。
-3. 31可以被jvm优化，`31*i`可以优化为`(i << 5) - i`。此时乘法运算被转为移位和减法运算。
+● 31是一个奇质数，使用质数作为乘子可以得到比较好的均匀分布区间，更好地降低哈希算法的冲突率。这是学者们经过大量计算得出的一个结论。<br>
+● 31占据5个bit，使用比31小的质数，得出的hash值较小，较容易产生冲突。使用比31大的质数，则容易发生运算溢出。<br>
+● 31可以被jvm优化，`31*i`可以优化为`(i << 5) - i`。此时乘法运算被转为移位和减法运算。
 
 此外还有个说法，因为31是一个奇素数，如果是偶数的话，当出现乘法溢出，信息就会丢失，因为与 2 相乘相当于向左移一位，最左边的位丢失。 
 
@@ -225,8 +226,8 @@ jdk1.8及之后，取消永久代，但是新增了本地内存的元空间Metas
 
 String#intern()是一个本地方法，用来将字符串放入常量池，在不同的jdk有不同的实现区别：
 
-* jdk1.6及以前：当字符串在常量池存在时，则返回常量池中的字符串；当字符串在常量池不存在时，则**在常量池中拷贝一份**，然后再返回常量池中的字符串。
-* jdk1.7：当字符串在常量池存在时，则返回常量池中的字符串；当字符串在常量池不存在时，则**把堆内存中此对象的引用添加到常量池中**，然后再返回此引用。
+● jdk1.6及以前：当字符串在常量池存在时，则返回常量池中的字符串；当字符串在常量池不存在时，则**在常量池中拷贝一份**，然后再返回常量池中的字符串。<br>
+● jdk1.7：当字符串在常量池存在时，则返回常量池中的字符串；当字符串在常量池不存在时，则**把堆内存中此对象的引用添加到常量池中**，然后再返回此引用。
 
 从jdk不同版本的源码注释即可看出差别，如果是在jdk1.6及以前的版本，频繁调用intern方法创建不同字符串常量时，会出现常量池不断创建新的字符串，进而引发永久代内存溢出。因此，jdk1.6以后版本的intern方法可以有效的减少内存的占用，提高运行时的性能。
 
@@ -245,9 +246,10 @@ false
 ```
 
 第一个是`true`可以理解，下面是分析过程：
-1. 首先在创建s1字符串的时候，会先在常量池里添加两个字面量：`go`和`od`；最后s1指向的是堆中new出来的字符串对象`good`。
-2. 调用`s1.intern()`时，会去常量池查找是否存在`good`这个字符串。查找的时候是通过`equals()`来比较的，此时常量池里不存在`good`这个字符串，所以会把s1这个引用放入常量池，然后返回该引用。
-3. 此时`s1.intern() == s1`的结果自然就是true了。
+
+● 首先在创建s1字符串的时候，会先在常量池里添加两个字面量：`go`和`od`；最后s1指向的是堆中new出来的字符串对象`good`。<br>
+● 调用`s1.intern()`时，会去常量池查找是否存在`good`这个字符串。查找的时候是通过`equals()`来比较的，此时常量池里不存在`good`这个字符串，所以会把s1这个引用放入常量池，然后返回该引用。<br>
+● 此时`s1.intern() == s1`的结果自然就是true了。
 
 第二个的结果却是`false`，这个就很让人困惑了。按道理应该结果也是`true`才对，既然是false，那就说明常量池原本就已经存在`java`这个字符串了。事实也是如此，这个字符串是在加载`sun.misc.Version`这个类时被放入常量池的，如下：
 ```java
@@ -270,14 +272,14 @@ public class Version
 
 ### 可变性
 
-* String是不可变的
-* StringBuffer和StringBuilder是可变的
+● String是不可变的<br>
+● StringBuffer和StringBuilder是可变的
 
 ### 线程安全
 
-* String是线程安全的，由String的不可变保证的
-* StringBuffer是线程安全的，由synchronize保证
-* StringBuilder是线程不安全的，但是性能比StringBuffer更加高效。在没有线程安全问题时使用StringBuilder就够了。
+● String是线程安全的，由String的不可变保证的<br>
+● StringBuffer是线程安全的，由synchronize保证<br>
+● StringBuilder是线程不安全的，但是性能比StringBuffer更加高效。在没有线程安全问题时使用StringBuilder就够了。
 
 ## 二进制安全字符串（Binary-safe strings）
 
@@ -301,12 +303,16 @@ String s2 = new String(s1.getBytes("GB2312"), "ISO-8859-1");
 ### 如何实现字符串的反转及替换？
 
 方法有很多，这里提供3种：
-1. 使用jdk自带的reverse()
+
+Ⅰ. 使用jdk自带的reverse()
+
 ```java
 String str="abc";
 String result = new StringBuilder(str).reverse().toString();
 ```
-2. 递归实现
+
+Ⅱ. 递归实现
+
 ```java
 public static String reverse(String originStr) {
     if(originStr == null || originStr.length() <= 1) 
@@ -314,7 +320,9 @@ public static String reverse(String originStr) {
     return reverse(originStr.substring(1)) + originStr.charAt(0);
 }
 ```
-3. 非递归实现
+
+Ⅲ. 非递归实现
+
 ```java
 String str="abc";
 StringBuilder temp = new StringBuilder();

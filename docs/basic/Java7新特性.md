@@ -1,6 +1,6 @@
 <!--
 date: 2021-04-19T22:34:12+08:00
-lastmod: 2021-05-09T22:34:12+08:00
+lastmod: 2021-05-18T22:34:12+08:00
 -->
 ## Java7新特性（New highlights）
 
@@ -16,10 +16,11 @@ byte a2 = 0B00000011;   // 3
 ## 数值中支持_（Underscores in Numeric Literals）
 
 允许在数值字面量中添加`_`来提供可读性，但是以下四种情况是不允许添加`_`的：
-* 在数字的开头或结尾
-* 在小数点前后
-* 在F/f、L/l的前面
-* 在进制标识符之间
+
+● 在数字的开头或结尾<br>
+● 在小数点前后<br>
+● 在F/f、L/l的前面<br>
+● 在进制标识符之间<br>
 
 ```java
 // 不可以
@@ -203,11 +204,12 @@ public void after() throws RuntimeException, IOException {
 
 ## 其他的一些新特性
 
-* 支持在JVM上运行动态类型语言，在字节码层面支持了`InvokeDynamic`（Support for Dynamic Languages）
-* 提供了新的I/O API（Java nio Package）
-	* [nio](/io/nio)
-* 逐渐去永久代化，字符串常量池和静态变量被转移到堆中。
-* 提供了ForkJoin框架，用于提供并行执行任务，是一个把大任务分割成若干个小任务，最终汇总每个小任务结果后得到大任务结果的框架。（Java8的parallelStream跟这个框架有关）
+● 支持在JVM上运行动态类型语言，在字节码层面支持了`InvokeDynamic`（Support for Dynamic Languages）<br>
+● 逐渐去永久代化，字符串常量池和静态变量被转移到堆中。<br>
+● 提供了ForkJoin框架，用于提供并行执行任务，是一个把大任务分割成若干个小任务，最终汇总每个小任务结果后得到大任务结果的框架。（Java8的parallelStream跟这个框架有关）<br>
+● 提供了新的I/O API（Java nio Package）
+
+* [nio](/io/nio)
 
 ## 参考链接
 

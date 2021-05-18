@@ -57,6 +57,7 @@
       repo: 'https://github.com/lewky',
 	  loadNavbar: true,
 	  search: {
+		maxAge: 86400000, // Expiration time, the default one day
 	  	paths: 'auto',
 	  	placeholder: '🔍 Type to search ',
 	  	noData: '😞 No Results! ',
@@ -91,8 +92,8 @@
   </script>
   <!-- Docsify v4 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
-  <!-- 搜索 -->
-  <script src="//cdn.bootcss.com/docsify/4.5.9/plugins/search.min.js"></script>
+  <!-- 搜索，这个版本的搜索才是功能正常的 -->
+  <script src="//cdn.bootcss.com/docsify/4.5.9/plugins/search.js"></script>
   <!-- 回到顶部 -->
   <script src="//unpkg.com/docsify-scroll-to-top@1.0.2/dist/docsify-scroll-to-top.min.js"></script>
   <!-- 代码格式 -->
