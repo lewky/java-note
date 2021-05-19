@@ -3,7 +3,7 @@
 	* [<i class="fas fa-fw fa-archive"></i> 基础篇](/basic/)
 	* [<i class="fas fa-fw fa-box"></i> 容器篇](/container/)
 * <i class="fas fa-fw fa-list"></i> Category
-	* <u>►▹基础篇◃◄</u>
+	* <b><u>►▹基础篇◃◄</u></b>
 	* [数据类型](/basic/数据类型)
 	* [String](/basic/String)
 	* [运算](/basic/运算)
