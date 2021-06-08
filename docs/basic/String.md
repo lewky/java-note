@@ -1,6 +1,6 @@
 <!--
 date: 2021-03-27T23:48:12+08:00
-lastmod: 2021-05-18T23:48:12+08:00
+lastmod: 2021-06-08T23:48:12+08:00
 -->
 ## String的不可变
 
@@ -334,7 +334,7 @@ String result = temp.toString();
 
 ## 参考链接
 
-* [二、String](http://cyc2018.gitee.io/cs-notes/#/notes/Java%20基础?id=%e4%ba%8c%e3%80%81string)
+* [二、String](http://www.cyc2018.xyz/Java/Java%20%E5%9F%BA%E7%A1%80.html#二、string)
 * [编译时常量和运行时常量](https://blog.csdn.net/Honeyhanyu/article/details/77878120?locationNum=6&fps=1)
 * [java谜题--java运行时修改引用类的静态常量](https://blog.csdn.net/feiyu8607/article/details/7064751)
 * [不同JDK版本中String.intern()方法的区别](https://blog.csdn.net/Game_Zmh/article/details/101701708)

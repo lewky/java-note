@@ -1,6 +1,6 @@
 <!--
 date: 2021-04-19T22:34:12+08:00
-lastmod: 2021-05-18T22:34:12+08:00
+lastmod: 2021-06-08T22:34:12+08:00
 -->
 ## Java7新特性（New highlights）
 
@@ -213,7 +213,7 @@ public void after() throws RuntimeException, IOException {
 
 ## 参考链接
 
-* [十一、特性](http://cyc2018.gitee.io/cs-notes/#/notes/Java%20基础?id=%e5%8d%81%e4%b8%80%e3%80%81%e7%89%b9%e6%80%a7)
+* [十一、特性](http://www.cyc2018.xyz/Java/Java%20%E5%9F%BA%E7%A1%80.html#十一、特性)
 * [Java SE 7新增特效](https://blog.csdn.net/u012104435/article/details/50971374)
 * [Java7的新特性](https://segmentfault.com/a/1190000004417830)
 * [Java 避免异常屏蔽 - addSuppressed](https://www.cnblogs.com/hbbbs/articles/11868942.html)

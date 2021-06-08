@@ -1,6 +1,6 @@
 <!--
 date: 2021-06-03T22:34:12+08:00
-lastmod: 2021-06-06T22:34:12+08:00
+lastmod: 2021-06-08T22:34:12+08:00
 -->
 ## 前言
 
@@ -468,7 +468,7 @@ ArrayList基于动态数组实现，LinkedList基于双向链表实现。ArrayLi
 
 ## 参考链接
 
-* [Java 容器](http://cyc2018.gitee.io/cs-notes/#/notes/Java%20容器)
+* [Java 容器](http://www.cyc2018.xyz/Java/Java%20%E5%AE%B9%E5%99%A8.html)
 * [Jdk 6260652 Bug](https://www.cnblogs.com/lsf90/p/5366325.html)
 * [Java 集合深入理解（7）：ArrayList](https://shixin.blog.csdn.net/article/details/52853989)
 * [Jdk 6260652 Bug](https://www.cnblogs.com/lsf90/p/5366325.html)
