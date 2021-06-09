@@ -2,20 +2,20 @@
 
 ## [基础篇](/basic/)
 
-* [数据类型](/basic/数据类型)
-* [String](/basic/String)
-* [运算](/basic/运算)
-* [继承](/basic/继承)
-* [关键字](/basic/关键字)
-* [反射](/basic/反射)
-* [异常](/basic/异常)
-* [泛型](/basic/泛型)
-* [注解](/basic/注解)
+* [数据类型](/all/basic_01_数据类型)
+* [String](/all/basic_02_String)
+* [运算](/all/basic_03_运算)
+* [继承](/all/basic_04_继承)
+* [关键字](/all/basic_05_关键字)
+* [反射](/all/basic_06_反射)
+* [异常](/all/basic_07_异常)
+* [泛型](/all/basic_08_泛型)
+* [注解](/all/basic_09_注解)
 * [新特性](#)
-	* [Java7新特性](/basic/Java7新特性)
-	* [Java8新特性](/basic/Java8新特性)
-* [面向对象](/basic/面向对象)
+	* [Java7新特性](/all/basic_10_Java7新特性)
+	* [Java8新特性](/all/basic_11_Java8新特性)
+* [面向对象](/all/basic_12_面向对象)
 
 <!--
-* [设计模式](/basic/设计模式)
+* [设计模式](/all/basic_13_设计模式)
 -->
