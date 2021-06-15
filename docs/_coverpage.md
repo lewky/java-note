@@ -1,4 +1,4 @@
-![logo](https://cdn.jsdelivr.net/gh/lewky/lewky.github.io@master/apple-touch-icon.png)
+![logo](https://cdn.jsdelivr.net/gh/lewky/java-note@main/static/favicon.jpg)
 
 # Java笔记
 
