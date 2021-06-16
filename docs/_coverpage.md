@@ -1,4 +1,4 @@
-![logo](https://cdn.jsdelivr.net/gh/lewky/java-note@main/static/favicon.jpg)
+![logo](https://cdn.jsdelivr.net/gh/lewky/java-note@main/docs/static/favicon.jpg)
 
 # Java笔记
 
