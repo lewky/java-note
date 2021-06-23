@@ -1,6 +1,6 @@
 <!--
 date: 2021-04-19T22:34:12+08:00
-lastmod: 2021-06-08T22:34:12+08:00
+lastmod: 2021-06-23T22:34:12+08:00
 -->
 ## 泛型（Generic）
 
@@ -697,26 +697,9 @@ public void test(List<Long> list) {}
 
 如何使用泛型实现LRU缓存？
 
-LRU就是`Least Recently Used`的缩写，即最近最少使用。JAVA提供的`LinkedHashMap`可以拿来实现LRU缓存的功能，除了可以设定排序的模式（按照访问排序还是按照插入排序），还可以重写删除最旧键值对的方法：
+LRU就是`Least Recently Used`的缩写，即最近最少使用。JAVA提供的`LinkedHashMap`可以拿来实现LRU缓存的功能，除了可以设定排序的模式（按照访问排序还是按照插入排序），还可以重写删除最旧键值对的方法。
 
-```java
-public class LRUCache<K, V> extends LinkedHashMap<K, V> {
-
-    private int size;
-
-    public LRUCache(int size) {
-		// 16是初始化容量，0.75是负载因子，true表示按照访问排序
-        super(16, (float) 0.75, true);
-        this.size = size;
-    }
-
-    @Override
-    // 该方法会在`put`和`putAll`插入元素之后自行调用，返回true表示应该删除最旧的元素。
-    protected boolean removeEldestEntry(java.util.Map.Entry<K, V> eldest) {
-        return size() > size;
-    }
-}
-```
+● [一个简单的lru缓存实现](/all/container_05_源码分析-Map?id=一个简单的lru缓存实现)
 
 ## 参考链接
 

@@ -1,6 +1,6 @@
 <!--
 date: 2021-06-06T22:34:12+08:00
-lastmod: 2021-06-10T22:38:12+08:00
+lastmod: 2021-06-23T22:38:12+08:00
 -->
 ## 前言
 
@@ -313,6 +313,142 @@ void transfer(Entry[] newTable, boolean rehash) {
 3）HashMap的迭代器是fail-fast迭代器<br>
 4）Hashtable的扩容是原来容量的二倍加1（2n+1），HashMap每次扩容为之前的两倍<br>
 5）Hashtable在计算桶下标时使用除法运算，效率较低；HashMap使用位运算来求桶下标
+
+## ConcurrentHashMap
+
+实现和HashMap类似，但ConcurrentHashMap是线程安全的。
+
+在jdk 1.7中，ConcurrentHashMap则是使用的分段锁（Segment）来进行并发更新操作，每个分段锁维护着几个桶（HashEntry），多个线程可以同时访问不同分段锁上的桶，从而使其并发度更高（并发度就是 Segment 的个数）。
+
+Segment继承自ReentrantLock，默认的并发级别为16，即默认创建16个Segment。由于Segment的存在，在获取当前的键值对总数size时，需要遍历每个Segment上的键值对数量并累计起来。
+
+在执行`size()`时先尝试在不加锁的情况下累计所有Segment的键值对数量`count`，同时也会累计所有Segment的数据结构改动次数`modCount`。如果连续两次不加锁的`modCount`统计结果一致，则认为此时统计得到的size是正确的。
+
+但尝试次数超过3次时，会对所有Segment加锁再继续统计，在连续两次统计结果一致时，返回size并对所有Segment解锁。
+
+而在jdk 1.8中，Segment已被CAS + synchronized取代。在添加新的键值对时，如果对应的桶下标不存在结点则会用CAS进行更新；如果已存在结点则会用synchronized进行同步，将新结点添加到原结点链表的末尾或者是插入到红黑树中。
+
+## LinkedHashMap
+
+### 概览
+
+继承自HashMap，在HashMap的基础之上，额外维护了一个双向链表，用来维护插入顺序或访问顺序（LRU）：
+
+```java
+static class Entry<K,V> extends HashMap.Node<K,V> {
+    Entry<K,V> before, after;
+    Entry(int hash, K key, V value, Node<K,V> next) {
+        super(hash, key, value, next);
+    }
+}
+
+/**
+ * The head (eldest) of the doubly linked list.
+ */
+transient LinkedHashMap.Entry<K,V> head;
+
+/**
+ * The tail (youngest) of the doubly linked list.
+ */
+transient LinkedHashMap.Entry<K,V> tail;
+```
+
+成员变量`accessOrder`决定了维护的顺序，true表示访问顺序，false表示插入顺序。默认维护的是插入顺序：
+
+```java
+final boolean accessOrder;
+```
+
+在HashMap中可以看到三个空实现的方法，LinkedHashMap对其进行了重写：
+
+```java
+// Callbacks to allow LinkedHashMap post-actions
+void afterNodeAccess(Node<K,V> p) { }
+void afterNodeInsertion(boolean evict) { }
+void afterNodeRemoval(Node<K,V> p) { }
+```
+
+`afterNodeAccess`和`afterNodeInsertion`这两个方法负责维护双向链表中结点的顺序，会在`put`、`get`等方法中被调用。
+
+### afterNodeAccess方法
+
+当一个结点被访问时，如果`accessOrder`为true，即维护的是访问顺序时，若该结点不是尾结点，则将其移动至双向链表的末尾。此时，链表的头结点即为最近最少被使用的结点，因此可以利用这种特性来实现LRU缓存。
+
+```java
+void afterNodeAccess(Node<K,V> e) { // move node to last
+    LinkedHashMap.Entry<K,V> last;
+    if (accessOrder && (last = tail) != e) {
+        LinkedHashMap.Entry<K,V> p =
+            (LinkedHashMap.Entry<K,V>)e, b = p.before, a = p.after;
+        p.after = null;
+        if (b == null)
+            head = a;
+        else
+            b.after = a;
+        if (a != null)
+            a.before = b;
+        else
+            last = b;
+        if (last == null)
+            head = p;
+        else {
+            p.before = last;
+            last.after = p;
+        }
+        tail = p;
+        ++modCount;
+    }
+}
+```
+
+### afterNodeInsertion方法
+
+当一个结点插入时，会判断是否移除最旧的结点，即移除头结点：
+
+```java
+void afterNodeInsertion(boolean evict) { // possibly remove eldest
+    LinkedHashMap.Entry<K,V> first;
+    if (evict && (first = head) != null && removeEldestEntry(first)) {
+        K key = first.key;
+        removeNode(hash(key), key, null, false, true);
+    }
+}
+```
+
+这里的`evict`参数只有在构建map时才是false，`removeEldestEntry`方法则是判断是否满足移除头结点的条件，默认实现是返回false。
+
+```java
+protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
+    return false;
+}
+```
+
+如果要用LinkedHashMap来实现LRU缓存，则需要重写`removeEldestEntry`方法，这样才能自动移除最旧的结点，避免内存不足，且驻留在缓存中的都是热点数据。
+
+### 一个简单的LRU缓存实现
+
+```java
+public class LRUCache<K, V> extends LinkedHashMap<K, V> {
+
+    private int size;
+
+    public LRUCache(int size) {
+        // 16是初始化容量，0.75是负载因子，true表示按照访问排序
+        super(16, (float) 0.75, true);
+        this.size = size;
+    }
+
+    @Override
+    // 该方法会在`put`和`putAll`插入元素之后自行调用，返回true表示应该删除最旧的元素。
+    protected boolean removeEldestEntry(java.util.Map.Entry<K, V> eldest) {
+        return size() > size;
+    }
+}
+```
+
+## WeakHashMap
+
+
 
 ## 参考链接
 
