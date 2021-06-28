@@ -1,6 +1,6 @@
 <!--
 date: 2021-06-06T22:34:12+08:00
-lastmod: 2021-06-23T22:38:12+08:00
+lastmod: 2021-06-28T22:38:12+08:00
 -->
 ## 前言
 
@@ -448,7 +448,112 @@ public class LRUCache<K, V> extends LinkedHashMap<K, V> {
 
 ## WeakHashMap
 
+### 概览
 
+WeakHashMap继承自AbstractMap，实现了Map接口，这是一个使用弱引用对象来包装key的map容器。（JDK 1.2扩充了引用的概念，细分为强引用、软引用、弱引用、虚引用四种引用。）
+
+WeakHashMap的Entry继承自WeakReference，底层使用该Entry数组来存储键值对。在下一次垃圾回收时弱引用对象中的key会被回收，然后该弱引用对象Entry会被放到一个队列中。
+
+```java
+private static class Entry<K,V> extends WeakReference<Object> implements Map.Entry<K,V> {
+    V value;
+    final int hash;
+    Entry<K,V> next;
+
+    /**
+     * Creates new entry.
+     */
+    Entry(Object key, V value,
+          ReferenceQueue<Object> queue,
+          int hash, Entry<K,V> next) {
+        super(key, queue);
+        this.value = value;
+        this.hash  = hash;
+        this.next  = next;
+    }
+}
+```
+
+每当发生垃圾回收后，ReferenceQueue中会存放被key被set成null的Entry对象，在调用`size()`、`resize()`、`get()`、`put()`等方法时，都会调用一个`expungeStaleEntries()`方法来移除queue中被回收了key的Entry对象：
+
+```java
+private void expungeStaleEntries() {
+    for (Object x; (x = queue.poll()) != null; ) {
+        synchronized (queue) {
+            @SuppressWarnings("unchecked")
+                Entry<K,V> e = (Entry<K,V>) x;
+            int i = indexFor(e.hash, table.length);
+
+            Entry<K,V> prev = table[i];
+            Entry<K,V> p = prev;
+            while (p != null) {
+                Entry<K,V> next = p.next;
+                if (p == e) {
+                    if (prev == e)
+                        table[i] = next;
+                    else
+                        prev.next = next;
+                    // Must not null out e.next;
+                    // stale entries may be in use by a HashIterator
+                    e.value = null; // Help GC
+                    size--;
+                    break;
+                }
+                prev = p;
+                p = next;
+            }
+        }
+    }
+}
+```
+
+利用这种弱引用对象的特性，可以用WeakHashMap来实现缓存。但是需要注意的是，不能使用及基础类型的包装类作为Key，因为包装类存在着缓存，这些缓存是不会被回收的，这会导致由缓存作为的Key所对应的Value对象永远不会被GC自动回收。这样就失去了使用WeakHashMap的意义。
+
+### ConcurrentCache
+
+Tomcat中的ConcurrentCache就使用了WeakHashMap来实现缓存功能。
+
+ConcurrentCache采取的是分代缓存：
+
+● 经常使用的对象放入eden（伊甸园）中，eden使用ConcurrentHashMap实现，不用担心会被回收。<br>
+● 不常用的对象放入longterm，longterm使用WeakHashMap实现，这些老对象会被垃圾收集器回收。<br>
+● 当调用get()方法时，会先从eden区获取，如果没有找到的话再到longterm获取，当从longterm获取到就把对象放入eden中，从而保证经常被访问的节点不容易被回收。<br>
+● 当调用put()方法时，如果eden的大小超过了size，那么就将eden中的所有对象都放入longterm中，利用虚拟机回收掉一部分不经常使用的对象。
+
+```java
+public final class ConcurrentCache<K, V> {
+
+    private final int size;
+
+    private final Map<K, V> eden;
+
+    private final Map<K, V> longterm;
+
+    public ConcurrentCache(int size) {
+        this.size = size;
+        this.eden = new ConcurrentHashMap<>(size);
+        this.longterm = new WeakHashMap<>(size);
+    }
+
+    public V get(K k) {
+        V v = this.eden.get(k);
+        if (v == null) {
+            v = this.longterm.get(k);
+            if (v != null)
+                this.eden.put(k, v);
+        }
+        return v;
+    }
+
+    public void put(K k, V v) {
+        if (this.eden.size() >= size) {
+            this.longterm.putAll(this.eden);
+            this.eden.clear();
+        }
+        this.eden.put(k, v);
+    }
+}
+```
 
 ## 参考链接
 
@@ -457,3 +562,4 @@ public class LRUCache<K, V> extends LinkedHashMap<K, V> {
 * [HashMap之tableSizeFor方法图解](https://www.cnblogs.com/xiyixiaodao/p/14483876.html)
 * [聊聊经典数据结构HashMap,逐行分析每一个关键点](https://baijiahao.baidu.com/s?id=1679219630514764243&wfr=spider&for=pc)
 * [jdk1.7HashMap链表头插法导致的死循环](https://blog.csdn.net/thqtzq/article/details/90485663)
+* [一文搞懂WeakHashMap工作原理（java后端面试高薪必备知识点）](https://baijiahao.baidu.com/s?id=1666368292461068600&wfr=spider&for=pc)
