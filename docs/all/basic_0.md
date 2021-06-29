@@ -1,6 +1,4 @@
-# [☕️ Java](/README)
-
-## [基础篇](/basic/)
+## [基础篇](/all/basic_0)
 
 * [数据类型](/all/basic_01_数据类型)
 * [String](/all/basic_02_String)
