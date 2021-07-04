@@ -1,6 +1,6 @@
 <!--
 date: 2021-05-15T22:34:12+08:00
-lastmod: 2021-06-08T22:34:12+08:00
+lastmod: 2021-06-29T22:34:12+08:00
 -->
 ## 算法复杂度
 
@@ -80,6 +80,18 @@ Queue <|.. PriorityQueue
 
 ### Set
 
+```java
+public interface Set<E> extends Collection<E> {
+	// 主要的方法
+    boolean add(E e);
+    boolean remove(Object o);
+    boolean addAll(Collection<? extends E> c);
+    boolean retainAll(Collection<?> c);
+    boolean removeAll(Collection<?> c);
+    void clear();
+}
+```
+
 **TreeSet**: 基于红黑树实现，支持有序性操作，例如根据一个范围来查找元素。但是查找效率不如HashSet，HashSet查找的时间复杂度为O(1)，TreeSet为O(logN)。
 
 **HashSet**：基于哈希表实现，支持快速查找，但不支持有序性操作，属于无序集合，如果使用Iterator遍历元素，得到的结果是不确定的。
@@ -87,6 +99,56 @@ Queue <|.. PriorityQueue
 **LinkedHashSet**：具有HashSet的查找效率，并且内部使用双向链表维护元素的插入顺序。
 
 ### List
+
+```java
+public interface List<E> extends Collection<E> {
+	// 主要的方法
+    boolean add(E e);
+    boolean remove(Object o);
+    boolean addAll(Collection<? extends E> c);
+    boolean addAll(int index, Collection<? extends E> c);
+    boolean removeAll(Collection<?> c);
+	boolean retainAll(Collection<?> c);
+    void clear();
+
+    E get(int index);
+    E set(int index, E element);
+    void add(int index, E element);
+    E remove(int index);
+}
+
+public class Stack<E> extends Vector<E> {
+	// 后入先出（LIFO）容器，主要的方法
+
+	// 入栈
+    public E push(E item) {
+        addElement(item);
+
+        return item;
+    }
+
+	// 出栈
+    public synchronized E pop() {
+        E       obj;
+        int     len = size();
+
+        obj = peek();
+        removeElementAt(len - 1);
+
+        return obj;
+    }
+
+	// 查询栈尾元素
+    public synchronized E peek() {
+        int     len = size();
+
+        if (len == 0)
+            throw new EmptyStackException();
+        return elementAt(len - 1);
+    }
+
+}
+```
 
 **ArrayList**：基于动态数组实现，支持随机访问。
 
@@ -97,6 +159,40 @@ Queue <|.. PriorityQueue
 * [Java集合类："随机访问" 的RandomAccess接口](https://www.cnblogs.com/yeya/p/9950723.html)
 
 ### Queue
+
+```java
+public interface Queue<E> extends Collection<E> {
+	// 主要的方法
+
+	// 成功将元素入队则返回true，若队列已满则抛出IllegalStateException
+    boolean add(E e);
+
+	// 成功将元素入队则返回true，否则返回false；若队满了不会抛异常
+    boolean offer(E e);
+
+	// 将队头元素出队，若队列为空则抛出NoSuchElementException
+    E remove();
+
+	// 将队头元素出队，若队列为空则返回null
+    E poll();
+
+	// 查询队头元素，若队列为空则抛出NoSuchElementException
+    E element();
+
+	// 查询队头元素，若队列为空则返回null
+    E peek();
+}
+
+public interface BlockingQueue<E> extends Queue<E> {
+	// 多出的两个关键方法
+
+	// 添加一个元素，若队列已满则阻塞
+    void put(E e) throws InterruptedException;
+
+	// 将队头元素出队，若队列为空则阻塞
+    E take() throws InterruptedException;
+}
+```
 
 **LinkedList**：可以用它来实现队列和双向队列。
 

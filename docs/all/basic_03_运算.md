@@ -1,6 +1,6 @@
 <!--
 date: 2021-03-29T23:31:12+08:00
-lastmod: 2021-05-18T23:31:12+08:00
+lastmod: 2021-07-04T23:31:12+08:00
 -->
 ## 三元运算符
 
@@ -147,6 +147,36 @@ Math.round(11.5)的返回值是12，Math.round(-11.5)的返回值是-11。**四�
 ## 用最有效率的方法计算2乘以8？
 
 2 << 3（左移3位相当于乘以2的3次方，右移3位相当于除以2的3次方）。
+
+## Comparable和Comparator区别
+
+**Comparable是排序接口，实现该接口需要重写`compareTo`方法。**实现该接口的对象，可以通过`compareTo`方法进行比较大小。
+
+```java
+public int compareTo(T o);
+```
+
+使用`Collections.sort`或`Arrays.sort`对Comparable的实现类进行排序时，或者将Comparable的实现类作为SortedMap、SortedSet的key时，无需指定Comparator比较器就能完成排序。
+
+**Comparator是比较器接口，实现该接口需要重写`compare`方法，`equals`方法可以不重写。**
+
+```java
+int compare(T o1, T o2);
+
+boolean equals(Object obj);
+```
+
+如果一个对象没有实现Comparable接口，则可以通过指定一个Comparator实现类作为比较器来为其进行排序。从Collections的两个sort方法的泛型和参数就可以看出来差别：
+
+```java
+public static <T extends Comparable<? super T>> void sort(List<T> list) {
+    list.sort(null);
+}
+
+public static <T> void sort(List<T> list, Comparator<? super T> c) {
+    list.sort(c);
+}
+```
 
 ## 参考链接
 
