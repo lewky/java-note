@@ -507,7 +507,7 @@ private void expungeStaleEntries() {
 }
 ```
 
-利用这种弱引用对象的特性，可以用WeakHashMap来实现缓存。但是需要注意的是，不能使用及基础类型的包装类作为Key，因为包装类存在着缓存，这些缓存是不会被回收的，这会导致由缓存作为的Key所对应的Value对象永远不会被GC自动回收。这样就失去了使用WeakHashMap的意义。
+利用这种弱引用对象的特性，可以用WeakHashMap来实现缓存。但是需要注意的是，不能使用基础类型以及基础类型的包装类作为Key（基础类型最为Key会自动装箱为包装类）。因为包装类存在着缓存，这些缓存是不会被回收的，这会导致由缓存作为的Key所对应的Value对象永远不会被GC自动回收。这样就失去了使用WeakHashMap的意义。
 
 ### ConcurrentCache
 
