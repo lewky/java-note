@@ -1,6 +1,6 @@
 <!--
 date: 2021-04-19T22:34:12+08:00
-lastmod: 2021-05-18T22:34:12+08:00
+lastmod: 2021-07-22T22:34:12+08:00
 -->
 ## Java8新特性
 
@@ -514,64 +514,17 @@ System.out.println(Arrays.toString(array));  // [4, 11, 20, 42, 123]
 ## 新的日期和时间API（Date and Time API）
 
 旧版本的日期API存在以下问题：
->* **非线程安全。**所有日期类都是可变的，这是Java日期类最大的问题之一。
->* **设计很差。**在`java.util`和`java.sql`的包中都有Date类，前者同时包含日期和时间，后者仅包含日期。用于格式化和解析的类则定义在`java.text`包中。
->* **时区处理麻烦。**日期类并不提供国际化，没有时区支持，因此Java引入了`java.util.Calendar`和`java.util.TimeZone`类，但他们同样存在上述所有的问题。
+
+● **非线程安全。**所有日期类都是可变的，这是Java日期类最大的问题之一。<br>
+● **设计很差。**在`java.util`和`java.sql`的包中都有Date类，前者同时包含日期和时间，后者仅包含日期。用于格式化和解析的类则定义在`java.text`包中。<br>
+● **时区处理麻烦。**日期类并不提供国际化，没有时区支持，因此Java引入了`java.util.Calendar`和`java.util.TimeZone`类，但他们同样存在上述所有的问题。
 
 Java8在`java.time`包提供了新的日期API：
->* **Local本地日期**：简化了日期时间的处理，没有时区的问题。
->* **Zoned时区日期**：通过指定的时区处理日期时间。
 
-### 本地日期API
+● **Local本地日期**：简化了日期时间的处理，没有时区的问题（相当于把日期都作为零时区来处理，但是并不携带时区信息）。<br>
+● **Zoned时区日期**：通过指定的时区处理日期时间。
 
-在不需要处理时区时使用：LocalDate、LocalTime、LocalDateTime，也就是获取系统默认时区的日期时间。
-
-```java
-// 本地日期
-LocalDate localDate = LocalDate.now();
-System.out.println(localDate);  // 2021-05-12
-System.out.println(localDate.getYear());  // 2021
-System.out.println(localDate.getMonthValue());  // 5
-System.out.println(localDate.getDayOfMonth());  // 12
-System.out.println(localDate.withYear(2017).withMonth(7).withDayOfMonth(1));  // 2017-07-01
-
-// 本地时间
-LocalTime localTime = LocalTime.now();
-System.out.println(localTime);  // 00:13:19.738
-System.out.println(localTime.getHour());  // 0
-System.out.println(localTime.plusHours(1)); // 01:13:19.738
-
-// 本地日期时间
-LocalDateTime localDateTime = LocalDateTime.now();
-System.out.println(localDateTime);  // 2021-05-12T00:13:19.738
-System.out.println(localDateTime.toLocalDate());    // 2021-05-12
-System.out.println(localDateTime.toLocalTime());    // 00:13:19.738
-System.out.println(localDateTime.getHour());    // 0
-
-// 指定日期
-System.out.println(LocalDate.of(2017, 7, 1));   // 2017-07-01
-System.out.println(LocalTime.of(0, 0));     // 00:00
-
-// 解析日期字符串
-System.out.println(LocalTime.parse("20:15:30"));    // 20:15:30
-```
-
-### 时区日期API
-
-时区日期类是ZonedDateTime：
-
-```java
-// 时区日期时间
-ZonedDateTime zonedDateTime = ZonedDateTime.now();
-System.out.println(zonedDateTime);  // 2021-05-12T08:22:21.404+08:00[Asia/Shanghai]
-
-System.out.println(zonedDateTime.getYear());    // 2021
-System.out.println(zonedDateTime.getOffset());  // +08:00
-System.out.println(zonedDateTime.getZone());    // Asia/Shanghai
-
-System.out.println(ZoneId.systemDefault());     // Asia/Shanghai
-System.out.println(ZoneId.SHORT_IDS.get("CTT"));// Asia/Shanghai
-```
+* [JDK 8新的日期和时间API](https://lewky.cn/posts/java-date-issues.html/#jdk-8新的日期和时间api)
 
 ## Optional容器类
 
