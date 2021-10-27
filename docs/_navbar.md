@@ -22,6 +22,9 @@
 	* [线程](/all/concurrency_01_线程)
 * [<i class="fas fa-fw fa-database"></i> 数据库](/all/db_0)
 	* [LeetCode - SQL题目](/all/db_01_leetcode_sql)
+* [<i class="fas fa-fw fa-laptop-code"></i> 算法篇](/all/algorithm_0)
+	* [动态规划](/all/algorithm_01_动态规划)
+	* [单调栈](/all/algorithm_02_单调栈)
 * <i class="fas fa-fw fa-fan fa-spin"></i> Links
     * [<i class="fas fa-fw fa-pen"></i> CS-Notes](http://www.cyc2018.xyz/)
     * [<i class="fas fa-fw fa-book"></i> Java 全栈知识体系](https://www.pdai.tech/)
