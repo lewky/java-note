@@ -19,6 +19,15 @@ lastmod: 2021-10-26T20:34:12+08:00
 
 这时候再将当前元素入栈，会在栈中逐渐形成一个自底向上的递减序列。由于题中说明不存在相同的元素，因此在每次遍历时，可以将当前元素的下一个更大元素存入哈希表中，方便最后返回结果数组。当然本题只需要找到下一个更大元素的值，对于某些题型，可能需要元素的下标来计算，此时哈希表就应该存入下标。
 
+### 使用ArrayDeque来作为栈
+
+ArrayDeque可以作为栈使用，也可以作为队列使用。不使用Stack是因为Stack继承了Vector，这两个容器都不推荐使用了。不使用LinkedList作为栈实现，是因为其底层是链表实现的，ArrayDeque底层是数组实现的：
+
+1）链表比数组花费更多空间<br>
+2）链表的随机访问性质比数组差（虽然这个对栈来说问题不大）<br>
+3）链表的每次插入和删除都涉及到一个节点对象的创建和弃用，非常低效和浪费空间，而动态数组几乎是0花费的(数组充满时重新拷贝除外)<br>
+4）链表是非连续的，访问时候不能充分利用cpu cache
+
 ```java
 class Solution {
     public int[] nextGreaterElement(int[] nums1, int[] nums2) {
@@ -49,7 +58,7 @@ class Solution {
 
 题目：https://leetcode-cn.com/problems/next-greater-element-ii/
 
-本体是496题目的升级版，要遍历的数组是一个循环数组，并且数组内的元素可以相等，这意味着不能使用哈希表来存下一个更大的值。
+本题是[496题](https://javanote.doc.lewky.cn/#/all/algorithm_02_单调栈?id=_496-%e4%b8%8b%e4%b8%80%e4%b8%aa%e6%9b%b4%e5%a4%a7%e5%85%83%e7%b4%a0-i)的升级版，要遍历的数组是一个循环数组，并且数组内的元素可以相等，这意味着不能使用哈希表来存下一个更大的值。
 
 遍历循环数组，可以看成是遍历2n次原本的数组，比如原本的循环数组是`[1,2,1]`，相当于遍历一个普通数组`[1,2,1,1,2,1]`，这时候可以用取模操作来获取对应的元素，而不需要额外拷贝一个2倍长度的数组。
 
@@ -82,3 +91,9 @@ class Solution {
 ## 42. 接雨水
 
 题目：https://leetcode-cn.com/problems/trapping-rain-water/
+
+
+
+## 参考链接
+
+* [为什么JDK建议使用ArrayDeque而不是Stack和LinkedList实现栈和队列](https://www.cnblogs.com/jiading/articles/12452830.html)
