@@ -18,6 +18,7 @@ Java的栈推荐使用ArrayDeque。
 括号类型必须按顺序结对才有效，换言之，将字符串中的括号按顺序结对消除，即左边的括号入栈，遇到对应的右边括号则出栈，最终若栈为空则说明是有效字符串。
 
 ```java
+class Solution {
     public boolean isValid(String s) {
         // 有效字符串只能是偶数长度
         if (s.length() % 2 != 0) {
@@ -48,6 +49,7 @@ Java的栈推荐使用ArrayDeque。
 
         return stack.isEmpty();
     }
+}
 ```
 <!--
 ## 301. 删除无效的括号
