@@ -15,6 +15,12 @@ lastmod: 2021-10-28T11:34:12+08:00
 
 具体可以看：[百度百科·排列组合](https://baike.baidu.com/item/%E6%8E%92%E5%88%97%E7%BB%84%E5%90%88/706498#2_1)
 
+## 回溯法
+
+对于求排列组合的题目类型，通常使用**回溯法**来解决。回溯法通常用最简单的递归方法 + 深度优先遍历（Depth-First-Search，DFS）来实现，用来搜索一个问题的所有的解（可能找不到解，即题目没有解），因此回溯法也叫爆搜（暴力解法），其时间复杂度很高。
+
+关于回溯法的入门可以看看这篇文章：[回溯算法入门级详解 + 练习（持续更新）](https://leetcode-cn.com/problems/permutations/solution/hui-su-suan-fa-python-dai-ma-java-dai-ma-by-liweiw/)
+
 ## 46. 全排列
 
 题目：https://leetcode-cn.com/problems/permutations/
