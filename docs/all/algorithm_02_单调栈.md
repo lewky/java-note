@@ -65,6 +65,7 @@ class Solution {
 在遍历过程中，当下标在原本数组范围内时再将对应的下一个更大元素存入结果数组中即可。
 
 ```java
+class Solution {
     public int[] nextGreaterElements(int[] nums) {
         Deque<Integer> stack = new ArrayDeque<>();
         int[] res = new int[nums.length];
@@ -81,6 +82,7 @@ class Solution {
 
         return res;
     }
+}
 ```
 
 ## 456. 132 模式
