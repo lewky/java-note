@@ -25,6 +25,9 @@
 * [<i class="fas fa-fw fa-laptop-code"></i> 算法篇](/all/algorithm_0)
 	* [动态规划](/all/algorithm_01_动态规划)
 	* [单调栈](/all/algorithm_02_单调栈)
+	* [消消乐](/all/algorithm_03_消消乐)
+	* [位运算](/all/algorithm_04_位运算)
+	* [排列组合](/all/algorithm_05_排列组合)
 * <i class="fas fa-fw fa-fan fa-spin"></i> Links
     * [<i class="fas fa-fw fa-pen"></i> CS-Notes](http://www.cyc2018.xyz/)
     * [<i class="fas fa-fw fa-book"></i> Java 全栈知识体系](https://www.pdai.tech/)

@@ -1,6 +1,6 @@
 <!--
 date: 2021-10-27T22:34:12+08:00
-lastmod: 2021-10-27T22:34:12+08:00
+lastmod: 2021-10-30T22:34:12+08:00
 -->
 
 ## 消消乐
@@ -8,6 +8,8 @@ lastmod: 2021-10-27T22:34:12+08:00
 这类问题需要按顺序解除字符、或者数字等，通常用**后入先出的栈**来模拟解决这类消消乐问题。
 
 Java的栈推荐使用ArrayDeque。
+
+* [为什么使用ArrayDeque作为栈](https://javanote.doc.lewky.cn/#/all/algorithm_02_单调栈?id=%e4%b8%ba%e4%bb%80%e4%b9%88%e4%bd%bf%e7%94%a8arraydeque%e4%bd%9c%e4%b8%ba%e6%a0%88)
 
 ## 20. 有效的括号
 
@@ -51,6 +53,7 @@ class Solution {
     }
 }
 ```
+
 <!--
 ## 301. 删除无效的括号
 
