@@ -1,6 +1,6 @@
 <!--
 date: 2021-10-28T11:34:12+08:00
-lastmod: 2021-10-30T11:34:12+08:00
+lastmod: 2021-11-02T11:34:12+08:00
 -->
 
 ## 排列组合
@@ -308,7 +308,9 @@ class Solution {
     }
 }
 ```
+
 ## 参考链接
 
 * [百度百科·排列组合](https://baike.baidu.com/item/%E6%8E%92%E5%88%97%E7%BB%84%E5%90%88/706498#2_1)
 * [回溯算法入门级详解 + 练习（持续更新）](https://leetcode-cn.com/problems/permutations/solution/hui-su-suan-fa-python-dai-ma-java-dai-ma-by-liweiw/)
+* [77. 组合 · 题解 · 回溯算法 + 剪枝（Java）](https://leetcode-cn.com/problems/combinations/solution/hui-su-suan-fa-jian-zhi-python-dai-ma-java-dai-ma-/)
