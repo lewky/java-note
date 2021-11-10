@@ -23,36 +23,38 @@ Java的栈推荐使用ArrayDeque。
 class Solution {
     public boolean isValid(String s) {
         // 有效字符串只能是偶数长度
-        if (s.length() % 2 != 0) {
+        int n = s.length();
+        if (n % 2 == 1) {
             return false;
         }
 
         // 括号必须结对，且要按顺序结对才有效（"([)]"是无效的）
         // 可以用栈来模拟结对消除，遍历结束后栈中为空则字符串有效
-        Deque<Character> stack = new ArrayDeque<>();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c == '(' || c == '[' || c == '{') {
-                stack.push(c);
-            } else if (c == ')') {
-                if (stack.isEmpty() || stack.poll() != '(') {
+        Map<Character, Character> pairs = new HashMap<Character, Character>() {{
+            put(')', '(');
+            put(']', '[');
+            put('}', '{');
+        }};
+        Deque<Character> stack = new LinkedList<Character>();
+        for (int i = 0; i < n; i++) {
+            char ch = s.charAt(i);
+            if (pairs.containsKey(ch)) {
+                if (stack.isEmpty() || stack.peek() != pairs.get(ch)) {
                     return false;
                 }
-            } else if (c == ']') {
-                if (stack.isEmpty() || stack.poll() != '[') {
-                    return false;
-                }
-            } else if (c == '}') {
-                if (stack.isEmpty() || stack.poll() != '{') {
-                    return false;
-                }
+                stack.pop();
+            } else {
+                stack.push(ch);
             }
         }
-
         return stack.isEmpty();
     }
 }
 ```
+
+上面代码在创建HashMap时，采用了匿名类的写法来快速初始化容器。第一对大括号表明这是一个继承自HashMap的匿名类，第二对大括号表明这是一个构造代码块。
+
+* [各种代码块的初始化顺序](http://localhost:3000/#/all/basic_05_关键字?id=%e5%88%9d%e5%a7%8b%e5%8c%96%e9%a1%ba%e5%ba%8f)
 
 <!--
 ## 301. 删除无效的括号

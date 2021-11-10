@@ -54,3 +54,52 @@ public class Solution {
 }
 ```
 
+## 206. 反转链表
+
+题目：https://leetcode-cn.com/problems/reverse-linked-list/
+
+### 迭代法
+
+双指针记录当前结点和上一个结点，迭代过程中逐渐反转链表结点。
+
+```java
+class Solution {
+    public ListNode reverseList(final ListNode head) {
+        ListNode cur = head;
+        ListNode pre = null;
+        while (cur != null) {
+            ListNode next = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = next;
+        }
+
+        return pre;
+    }
+}
+```
+
+### 递归法
+
+递归法比较复杂，在递归反转结点的过程中，当前结点的下一个结点的下一个结点需要指向当前结点，即：
+
+原本链表： a -> b -> c
+
+反转之后： a <- b <- c
+
+需要注意的是，第一个结点的下一个结点必须指向null，否则最终会形成环形链表。
+
+```java
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode newHead = reverseList(head.next);
+        head.next.next = head;
+		// 避免递归返回到第一个结点时，形成环，即第一个结点指向第二个结点，第二个结点又指向第一个结点
+        head.next = null;
+        return newHead;
+    }
+}
+```
