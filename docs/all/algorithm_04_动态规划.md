@@ -1,6 +1,6 @@
 <!--
 date: 2021-10-26T08:34:12+08:00
-lastmod: 2021-10-30T08:34:12+08:00
+lastmod: 2021-11-11T08:34:12+08:00
 -->
 
 ## 动态规划Dynamic Programming
@@ -15,7 +15,7 @@ lastmod: 2021-10-30T08:34:12+08:00
 
 题目：https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock/
 
-### 动态规划解法
+### 动态规划法
 
 求某段时间内的最高利润，如果将每天的股价数组转为每天的价格波动（即利润数组），则可以转化为一个动态规划问题，即求一个数字序列的连续子序列最大的和。
 
@@ -64,6 +64,42 @@ class Solution {
         }
 
         return max;
+    }
+}
+```
+
+## 118. 杨辉三角
+
+题目：https://leetcode-cn.com/problems/pascals-triangle/
+
+这道题的状态转移方程一目了然，跟斐波那契数列差不多，很轻松就可以用动态规划法做出来。
+
+此外，可以发现杨辉三角的边缘都是1，且每一行的数字都是左右对称的，因此可以利用这个性质只计算前半截的数字，后半截可以直接获取到对称的值，这样可以提高时间效率。
+
+```java
+class Solution {
+    public List<List<Integer>> generate(final int numRows) {
+        final List<List<Integer>> res = new ArrayList<>();
+
+        for (int i = 0; i < numRows; i++) {
+            final List<Integer> subRes = new ArrayList<>();
+            subRes.add(1);
+            for (int j = 1; j < i + 1; j++) {
+                if (j < (i + 2) / 2) {
+                    if (i > 0) {
+                        final int temp = res.get(i - 1).get(j) + res.get(i - 1).get(j - 1);
+                        subRes.add(temp);
+                    }
+                } else {
+                    final int temp = subRes.get(i - j);
+                    subRes.add(temp);
+                }
+            }
+
+            res.add(subRes);
+        }
+
+        return res;
     }
 }
 ```

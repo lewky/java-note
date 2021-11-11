@@ -1,6 +1,6 @@
 <!--
 date: 2021-11-09T10:34:12+08:00
-lastmod: 2021-11-10T10:34:12+08:00
+lastmod: 2021-11-11T10:34:12+08:00
 -->
 
 ## 1. 两数之和
@@ -59,6 +59,33 @@ class Solution {
                 p2--;
             }
         }
+    }
+}
+```
+
+## 383. 赎金信
+
+题目：https://leetcode-cn.com/problems/ransom-note/
+
+先统计杂志中所有字符的出现次数，然后再遍历赎金信的字符，当杂志中对应的字符的次数不够使用时则返回false。
+
+```java
+class Solution {
+    public boolean canConstruct(final String ransomNote, final String magazine) {
+        // 字符串都是小写字母，因此用数组来替代哈希表以统计次数，可以节省内存
+        // magazine.charAt(i) - 'a'相当于快速求hash，即字符对应的数组下标
+        final int[] temp = new int[26];
+        for (int i = 0; i < magazine.length(); i++) {
+            ++temp[magazine.charAt(i) - 'a'];
+        }
+
+        for (int i = 0; i < ransomNote.length(); i++) {
+            if (--temp[ransomNote.charAt(i) - 'a'] < 0) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
 ```
