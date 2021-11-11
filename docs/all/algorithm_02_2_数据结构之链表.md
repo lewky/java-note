@@ -1,6 +1,6 @@
 <!--
 date: 2021-11-09T10:34:12+08:00
-lastmod: 2021-11-09T10:34:12+08:00
+lastmod: 2021-11-12T10:34:12+08:00
 -->
 
 ## 141. 环形链表
@@ -100,6 +100,66 @@ class Solution {
 		// 避免递归返回到第一个结点时，形成环，即第一个结点指向第二个结点，第二个结点又指向第一个结点
         head.next = null;
         return newHead;
+    }
+}
+```
+
+## 203. 移除链表元素
+
+题目：https://leetcode-cn.com/problems/remove-linked-list-elements/
+
+### 双指针
+
+常规思路是使用两个指针，分别记录当前结点和上一个结点，在遍历删除的过程中记录新的头结点：
+
+```java
+class Solution {
+    public ListNode removeElements(ListNode head, int val) {
+        ListNode cur = head;
+        ListNode pre = null;
+        ListNode newHead = null;
+        while (cur != null) {
+            if (cur.val == val) {
+                ListNode next = cur.next;
+                cur.next = null;
+                cur = next;
+                if (pre != null) {
+                    pre.next = cur;
+                }
+            } else {
+                if (newHead == null) {
+                    newHead = cur;
+                }
+                pre = cur;
+                cur = cur.next;
+            }
+        }
+
+        return newHead;
+    }
+}
+```
+
+### 虚拟头结点
+
+注意到上一个思路的条件分支比较多，原因是需要考虑到头结点需要删除的情况。如果我们创建一个假的头结点，然后指向真正的头结点，那么就可以无需写这么多的条件分支。
+
+这种做法巧妙地将头结点需要删除的特殊情况，转换成了普通结点需要删除的场景。
+
+```java
+class Solution {
+    public ListNode removeElements(ListNode head, int val) {
+        ListNode dummyHead = new ListNode(0, head);
+        ListNode cur = dummyHead;
+        while (cur.next != null) {
+            if (cur.next.val == val) {
+                cur.next = cur.next.next;
+            } else {
+                cur = cur.next;
+            }
+        }
+
+        return dummyHead.next;
     }
 }
 ```
