@@ -1,6 +1,6 @@
 <!--
 date: 2021-11-09T10:34:12+08:00
-lastmod: 2021-11-10T10:34:12+08:00
+lastmod: 2021-11-12T10:34:12+08:00
 -->
 
 # 栈
@@ -65,3 +65,112 @@ class Solution {
 # 队列
 
 队列用来处理先入先出的场景问题，在增删元素比较频繁的场景，同样可以用ArrayDeque来实现队列。
+
+## 232. 用栈实现队列
+
+题目：https://leetcode-cn.com/problems/implement-queue-using-stacks/
+
+### 常规思路
+
+用两个栈来实现队列的四个操作：队尾入队，队头出队，查看队头，是否为空。
+
+通常思路是利用一个栈来存储元素，另一个栈作为临时容器以反转存储元素的顺序。在push操作时，如果s1栈中元素为空，则记录入栈的元素为队头元素。在入栈之前，先将s1栈中元素搬到另一个栈s2，然后新元素入栈到s2中。接着把栈s2的元素搬到栈s1中，这样**栈s1中的元素就跟队列先入先出一样的存储顺序了**。
+
+此时，由于`push()`操作需要调整元素的存储顺序，时间复杂度为O(n)；另外三个操作都跟栈原本操作一样，时间复杂度是O(1)。
+
+```java
+class MyQueue {
+
+    Integer front;
+    ArrayDeque<Integer> s1 = new ArrayDeque<>();
+    ArrayDeque<Integer> s2 = new ArrayDeque<>();
+
+    public MyQueue() {
+
+    }
+
+    public void push(final int x) {
+        if (s1.isEmpty()) {
+            front = x;
+        }
+        while (!s1.isEmpty()) {
+            s2.push(s1.pop());
+        }
+        s2.push(x);
+        while (!s2.isEmpty()) {
+            s1.push(s2.pop());
+        }
+    }
+
+    public int pop() {
+        return s1.pop();
+    }
+
+    public int peek() {
+        return s1.peek();
+    }
+
+    public boolean empty() {
+        return s1.isEmpty();
+    }
+}
+```
+
+### 均摊每个操作的时间复杂度
+
+本题有个进阶要求，均摊每个操作的时间复杂度为O(1)。因此，可以将上述思路中的最耗时间的`push()`操作的时间复杂度，分摊到`pop()`中，即同时使用两个栈来存储元素。经过摊还时间复杂度，每个操作都为O(1)。
+
+push的操作中，不再借助另一个栈来调整元素的存储顺序，而是直接将元素入栈s1。如果s1栈中元素为空，则记录入栈的元素为队头元素front。
+
+在pop操作时，如果栈s2为空，则将元素从栈s1中搬到栈s2中来，此时最顶部的元素是最早入栈的元素，即队头元素，此时直接将栈s2的元素出栈即可。
+
+在peek操作时，如果栈s2不为空，则栈顶部的元素是队头元素；否则返回之前记录的front元素。
+
+在empty操作时，需要同时判断两个栈中元素是否为空。
+
+```java
+class MyQueue {
+
+    Integer front;
+    ArrayDeque<Integer> s1 = new ArrayDeque<>();
+    ArrayDeque<Integer> s2 = new ArrayDeque<>();
+
+    public MyQueue() {
+
+    }
+
+    public void push(final int x) {
+        if (s1.isEmpty()) {
+            front = x;
+        }
+        s1.push(x);
+    }
+
+    public int pop() {
+        if (s2.isEmpty()) {
+            while (!s1.isEmpty()) {
+                s2.push(s1.pop());
+            }
+        }
+
+        return s2.pop();
+    }
+
+    public int peek() {
+        if (!s2.isEmpty()) {
+            return s2.peek();
+        }
+
+        return front;
+    }
+
+    public boolean empty() {
+
+        return s1.isEmpty() && s2.isEmpty();
+    }
+}
+```
+
+## 参考链接
+
+* [用栈实现队列官方题解](https://leetcode-cn.com/problems/implement-queue-using-stacks/solution/yong-zhan-shi-xian-dui-lie-by-leetcode/)
