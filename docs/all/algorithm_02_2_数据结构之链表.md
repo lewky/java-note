@@ -1,6 +1,6 @@
 <!--
 date: 2021-11-09T10:34:12+08:00
-lastmod: 2021-11-12T10:34:12+08:00
+lastmod: 2021-11-17T10:34:12+08:00
 -->
 
 ## 141. 环形链表
@@ -160,6 +160,39 @@ class Solution {
         }
 
         return dummyHead.next;
+    }
+}
+```
+
+## 146. LRU 缓存机制
+
+题目：https://leetcode-cn.com/problems/lru-cache/
+
+实际上就是使用哈希表 + 双向链表来实现，哈希表负责存键值对，双向链表负责维护节点顺序，这里维护的是最近使用的顺序。Java中已经提供了这样的实现，即LinkedHashMap，有兴趣的也可以看看源码，自己手写一个。
+
+```java
+class LRUCache extends LinkedHashMap<Integer, Integer> {
+    
+    private int capacity;
+
+    public LRUCache(final int capacity) {
+        super(capacity, 0.75f, true);
+        this.capacity = capacity;
+    }
+
+    public int get(final int key) {
+
+        return super.getOrDefault(key, -1);
+    }
+
+    public void put(final int key, final int value) {
+        super.put(key, value);
+    }
+    
+    @Override
+    // 该方法会在`put`和`putAll`插入元素之后自行调用，返回true表示应该删除最旧的元素。
+    protected boolean removeEldestEntry(java.util.Map.Entry<Integer, Integer> eldest) {        
+        return size() > capacity;
     }
 }
 ```

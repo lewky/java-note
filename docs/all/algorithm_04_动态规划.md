@@ -1,6 +1,6 @@
 <!--
 date: 2021-10-26T08:34:12+08:00
-lastmod: 2021-11-11T08:34:12+08:00
+lastmod: 2021-11-17T08:34:12+08:00
 -->
 
 ## 动态规划Dynamic Programming
@@ -100,6 +100,49 @@ class Solution {
         }
 
         return res;
+    }
+}
+```
+
+## 375. 猜数字大小 II
+
+题目：https://leetcode-cn.com/problems/guess-number-higher-or-lower-ii/
+
+### 极小化极大算法
+
+Minimax算法（亦称 MinMax or MM）又名极小化极大算法，是一种找出失败的最大可能性中的最小值的算法。具体可以参考百度百科：[极小化极大算法](https://baike.baidu.com/item/%E6%9E%81%E5%B0%8F%E5%8C%96%E6%9E%81%E5%A4%A7%E7%AE%97%E6%B3%95/1351828?fr=aladdin)
+
+本题可以用一个二维数组dp[i][j]来表示从i到j之间的可以确保获胜的最小现金数，在i和j之间猜数字k，k的范围在i和j之间，会有三种情况：
+
+1）猜对数字，此时无需支付现金<br>
+2）猜的数字小了，即k小于实际数字，此时需要缩小下一次猜测的范围，即i到k-1<br>
+3）猜的数字大了，即k大于实际数字，此时需要扩大下一次猜测的范围，即k+1到j
+
+为了确保获胜，需要考虑最差情况，也就是取上述三种情况中的最大值现金数，也就是取局部极大值。
+
+然后在i和j之间猜数字，需要遍历所有数字，也就是逐个猜i和j之间的数字，来找到所有局部极大值中的最小值。综合起来，就是极小化极大算法。
+
+由于是二维数组，对于不满足猜测范围的数字，可以认为是无需猜测就能得到答案，此时无需支付现金，也就是说值是0。
+
+```java
+class Solution {
+    public int getMoneyAmount(final int n) {
+        final int[][] dp = new int[n + 1][n + 1];
+        // 逆序遍历是为了找dp值时，被依赖的dp值还未计算出来
+        for (int i = n - 1; i >= 1; i--) {
+            for (int j = i + 1; j <= n; j++) {
+                // 为了避免k取j值时越界，先记录k为j值的dp值
+                dp[i][j] = j + dp[i][j - 1];
+                for (int k = i; k < j; k++) {
+                    // 找到所有k值时的最小值
+                    // dp值需要考虑最大值（即最差情况）
+                    dp[i][j] = Math.min(dp[i][j], k + Math.max(dp[k + 1][j], dp[i][k - 1]));
+                }
+
+            }
+        }
+
+        return dp[1][n];
     }
 }
 ```

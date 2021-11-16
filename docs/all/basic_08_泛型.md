@@ -1,6 +1,6 @@
 <!--
 date: 2021-04-19T22:34:12+08:00
-lastmod: 2021-06-23T22:34:12+08:00
+lastmod: 2021-11-17T22:34:12+08:00
 -->
 ## 泛型（Generic）
 
@@ -699,7 +699,7 @@ public void test(List<Long> list) {}
 
 LRU就是`Least Recently Used`的缩写，即最近最少使用。JAVA提供的`LinkedHashMap`可以拿来实现LRU缓存的功能，除了可以设定排序的模式（按照访问排序还是按照插入排序），还可以重写删除最旧键值对的方法。
 
-● [一个简单的lru缓存实现](/all/container_05_源码分析-Map?id=一个简单的lru缓存实现)
+这是力扣的一道LRU的题目，有兴趣可以看看：[146. LRU 缓存机制](/all/algorithm_02_2_数据结构之链表?id=_146-lru-%e7%bc%93%e5%ad%98%e6%9c%ba%e5%88%b6)
 
 ## 参考链接
 

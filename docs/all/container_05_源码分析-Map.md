@@ -1,6 +1,6 @@
 <!--
 date: 2021-06-06T22:34:12+08:00
-lastmod: 2021-06-28T22:38:12+08:00
+lastmod: 2021-11-17T22:38:12+08:00
 -->
 ## 前言
 
@@ -425,26 +425,7 @@ protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
 
 如果要用LinkedHashMap来实现LRU缓存，则需要重写`removeEldestEntry`方法，这样才能自动移除最旧的结点，避免内存不足，且驻留在缓存中的都是热点数据。
 
-### 一个简单的LRU缓存实现
-
-```java
-public class LRUCache<K, V> extends LinkedHashMap<K, V> {
-
-    private int size;
-
-    public LRUCache(int size) {
-        // 16是初始化容量，0.75是负载因子，true表示按照访问排序
-        super(16, (float) 0.75, true);
-        this.size = size;
-    }
-
-    @Override
-    // 该方法会在`put`和`putAll`插入元素之后自行调用，返回true表示应该删除最旧的元素。
-    protected boolean removeEldestEntry(java.util.Map.Entry<K, V> eldest) {
-        return size() > size;
-    }
-}
-```
+这是力扣的一道LRU的题目，有兴趣可以看看：[146. LRU 缓存机制](/all/algorithm_02_2_数据结构之链表?id=_146-lru-%e7%bc%93%e5%ad%98%e6%9c%ba%e5%88%b6)
 
 ## WeakHashMap
 

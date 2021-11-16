@@ -1,6 +1,6 @@
 <!--
 date: 2021-10-28T11:34:12+08:00
-lastmod: 2021-10-31T11:34:12+08:00
+lastmod: 2021-11-16T11:34:12+08:00
 -->
 
 ## 位运算
@@ -229,6 +229,39 @@ class Solution {
         }
         
         return res;
+    }
+}
+```
+
+## 520. 检测大写字母
+
+题目：https://leetcode-cn.com/problems/detect-capital/
+
+这道题有点脑筋急转弯的意思，如果单纯按照题意来写出各种if分支，必然会比较多分支。分析题意，可以知道若第一个字母是小写，那么第二个字母不能是大写；此时其他的情况可以统一处理：无论第一个字母是什么情况，只需要判断第二个字母和后续的字母是否大小写相同。
+
+而保证一个字符串的字母是否全为大写或小写，可以用位运算来简单的判断。
+
+```java
+class Solution {
+    public boolean detectCapitalUse(final String word) {
+        if (word.length() <= 1) {
+            return true;
+        }
+
+        // 如果第一个字母是小写，需判断第二个字母是否为小写
+        final boolean secondCapital = word.charAt(1) <= 'Z';
+        if (word.charAt(0) > 'Z' && secondCapital) {
+            return false;
+        }
+
+        // 无论第 1 个字母是否大写，其他字母必须与第 2 个字母的大小写相同
+        for (int i = 2; i < word.length(); i++) {
+            if (word.charAt(i) <= 'Z' ^ secondCapital) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
 ```
