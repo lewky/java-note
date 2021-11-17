@@ -31,6 +31,7 @@
 	* [单调栈](/all/algorithm_03_单调栈)
 	* [动态规划](/all/algorithm_04_动态规划)
 	* [排列组合](/all/algorithm_05_排列组合)
+	* [字符串](/all/algorithm_06_字符串)
 * <i class="fas fa-fw fa-fan fa-spin"></i> Links
     * [<i class="fas fa-fw fa-pen"></i> CS-Notes](http://www.cyc2018.xyz/)
     * [<i class="fas fa-fw fa-book"></i> Java 全栈知识体系](https://www.pdai.tech/)
