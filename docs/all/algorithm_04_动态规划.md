@@ -1,6 +1,6 @@
 <!--
 date: 2021-10-26T08:34:12+08:00
-lastmod: 2021-11-17T08:34:12+08:00
+lastmod: 2021-11-18T08:34:12+08:00
 -->
 
 ## 动态规划Dynamic Programming
@@ -128,7 +128,7 @@ Minimax算法（亦称 MinMax or MM）又名极小化极大算法，是一种找
 class Solution {
     public int getMoneyAmount(final int n) {
         final int[][] dp = new int[n + 1][n + 1];
-        // 逆序遍历是为了找dp值时，被依赖的dp值还未计算出来
+        // 逆序遍历是为了找dp值时，避免被依赖的dp值还未计算出来
         for (int i = n - 1; i >= 1; i--) {
             for (int j = i + 1; j <= n; j++) {
                 // 为了避免k取j值时越界，先记录k为j值的dp值

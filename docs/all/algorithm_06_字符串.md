@@ -1,6 +1,6 @@
 <!--
 date: 2021-11-17T11:34:12+08:00
-lastmod: 2021-11-17T11:34:12+08:00
+lastmod: 2021-11-18T11:34:12+08:00
 -->
 
 ## 412. Fizz Buzz
@@ -87,6 +87,33 @@ class Solution {
             sb.append(c);
         }
         return sb.toString();
+    }
+}
+```
+
+## 771. 宝石与石头
+
+题目：https://leetcode-cn.com/problems/jewels-and-stones/
+
+用打表法即可，由于字符串都是大小写字母，因此直接用数组作为一个简易的哈希表即可，数组大小为58（即下标最大值为'z' - 'A'=57）。
+
+大部分只有大小写字母的字符串的打表法都可以用数组来模拟哈希表，可以节省内存。
+
+```java
+class Solution {
+    public int numJewelsInStones(String jewels, String stones) {
+        int[] temp = new int[58];
+        for (int i = 0; i < jewels.length(); i++) {
+            ++temp[jewels.charAt(i) - 'A'];
+        }
+        int count = 0;
+        for (int i = 0; i < stones.length(); i++) {
+            if (temp[stones.charAt(i) - 'A'] > 0) {
+                ++count;
+            }
+        }
+        
+        return count;
     }
 }
 ```
