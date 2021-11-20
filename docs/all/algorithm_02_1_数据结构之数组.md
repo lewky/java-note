@@ -1,6 +1,6 @@
 <!--
 date: 2021-11-09T10:34:12+08:00
-lastmod: 2021-11-11T10:34:12+08:00
+lastmod: 2021-11-20T10:34:12+08:00
 -->
 
 ## 1. 两数之和
@@ -86,6 +86,87 @@ class Solution {
         }
 
         return true;
+    }
+}
+```
+
+## 36. 有效的数独
+
+题目：https://leetcode-cn.com/problems/valid-sudoku/
+
+用三个数组来模拟哈希表，记录数独中每个数字在行、列和九宫格出现的次数，如果重复出现则该数独无效。
+
+使用`board[i][j] - '1'] > 1`来快速定位到数组下标，将对应的值加一，如果增大后的值超过1说明当前数字在当前的行/列/九宫格里重复出现。
+
+使用`i / 3 * 3 + j / 3`来计算出当前的数字属于第几个九宫格。
+
+```java
+class Solution {
+    public boolean isValidSudoku(char[][] board) {
+		// 记录每行出现的数字，row
+        int[][] x = new int[9][9];
+		// 记录每列出现的数字，column
+        int[][] y = new int[9][9];
+		// 记录每个九宫格出现的数字，area
+        int[][] z = new int[9][9];
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                if (board[i][j] != '.' && (++x[i][board[i][j] - '1'] > 1 || ++y[j][board[i][j] - '1'] > 1 || ++z[i / 3 * 3 + j / 3][board[i][j] - '1'] > 1)) {
+                   return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+}
+```
+
+## 594. 最长和谐子序列
+
+题目：https://leetcode-cn.com/problems/longest-harmonious-subsequence/
+
+### 滑动窗口
+
+先将数组排序，然后使用begin变量记录连续相同元素序列的第一个下标，遍历数组过程中i为连续相同元素序列的末尾元素的下一个相邻元素下标。当二者之间相差为1时，则可以得到两个元素之间的长度。最后就是在遍历中记录最大的序列长度即可。
+
+```java
+class Solution {
+    public int findLHS(int[] nums) {
+        Arrays.sort(nums);
+        int begin = 0, res = 0;
+        for (int i = 0; i < nums.length; i++) {
+            while (nums[i] - nums[begin] > 1) {
+                begin++;
+            }
+            if (nums[i] - nums[begin] == 1) {
+                res = Math.max(res, i - begin + 1);
+            }
+        }
+        
+        return res;
+    }
+}
+```
+
+### 哈希表计数
+
+可以用哈希表来记录数组中每个元素的出现次数，然后遍历哈希表，获取x和x+1的组合的个数，即为对应的和谐子序列的长度。最后在遍历中记录最大的序列长度即可。
+
+```java
+class Solution {
+    public int findLHS(int[] nums) {
+        HashMap <Integer, Integer> cnt = new HashMap <>();
+        int res = 0;
+        for (int num : nums) {
+            cnt.put(num, cnt.getOrDefault(num, 0) + 1);
+        }
+        for (int key : cnt.keySet()) {
+            if (cnt.containsKey(key + 1)) {
+                res = Math.max(res, cnt.get(key) + cnt.get(key + 1));
+            }
+        }
+        return res;
     }
 }
 ```
