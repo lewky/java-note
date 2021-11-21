@@ -12,8 +12,3 @@
 * <a href="javascrip:void(0);">新特性</a>
 	* [Java7新特性](/all/basic_10_Java7新特性)
 	* [Java8新特性](/all/basic_11_Java8新特性)
-* [面向对象](/all/basic_12_面向对象)
-
-<!--
-* [设计模式](/all/basic_13_设计模式)
--->
