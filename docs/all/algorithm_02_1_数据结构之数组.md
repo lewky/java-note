@@ -1,6 +1,6 @@
 <!--
 date: 2021-11-09T10:34:12+08:00
-lastmod: 2021-11-20T10:34:12+08:00
+lastmod: 2021-11-22T10:34:12+08:00
 -->
 
 ## 1. 两数之和
@@ -166,6 +166,45 @@ class Solution {
                 res = Math.max(res, cnt.get(key) + cnt.get(key + 1));
             }
         }
+        return res;
+    }
+}
+```
+
+## 384. 打乱数组
+
+题目：https://leetcode-cn.com/problems/shuffle-an-array/
+
+### 洗牌算法
+
+本题是洗牌算法的模板题，洗牌算法实际上就是原地打乱元素顺序。对于一个数组，在每次遍历时随机选取一个元素，将其与数组中尚未洗牌的第一个元素进行置换。
+
+这样第一个元素就完成了洗牌，剩下的元素尚待洗牌。在下次遍历时，从尚未洗牌的元素中重新随机选取一个，将其与尚未洗牌的第一个元素（也就是原数组的第二个元素）进行置换。以此类推，直到遍历结束，整个数组完成洗牌。
+
+```java
+class Solution {
+    private int[] nums;
+    private int[] res;
+    private Random random = new Random();
+
+    public Solution(int[] nums) {
+        this.nums = nums;
+        res = new int[nums.length];
+        System.arraycopy(nums, 0, res, 0, nums.length);
+    }
+    
+    public int[] reset() {
+        return nums;
+    }
+    
+    public int[] shuffle() {
+        for (int i = 0; i < res.length; i++) {
+            int index = i + random.nextInt(res.length - i);
+            int temp = res[i];
+            res[i] = res[index];
+            res[index] = temp;
+        }
+        
         return res;
     }
 }
