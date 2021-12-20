@@ -1,6 +1,6 @@
 <!--
 date: 2021-12-08T22:34:12+08:00
-lastmod: 2021-12-09T22:34:12+08:00
+lastmod: 2021-12-20T22:34:12+08:00
 -->
 ## 单例模式（Singleton Pattern）
 
@@ -82,6 +82,53 @@ public class LazySingleton2 {
 
 同步块内再判断一次，是因为假若有多个线程在竞争锁，此时如果第一个获得锁的线程已经创建了单例对象，其他排队的线程则无需再次创建对象，因此需要在同步块内再判断一次。此外，为了保证其他线程能立刻获取instance变量最新的值，这里使用了volatile关键词。
 
+被volatile修饰的变量的值，将不会被本地线程缓存，所有对该变量的读写都是直接操作共享内存。**注意：在java1.4及以前版本中，很多JVM对于volatile关键字的实现的问题，会导致“双重检查加锁”的失败，因此“双重检查加锁”机制只只能用在java5及以上的版本。**
+
+由于volatile关键字可能会屏蔽掉虚拟机中一些必要的代码优化，所以运行效率并不是很高。因此一般建议，没有特别的需要，不要使用。也就是说，虽然可以使用“双重检查加锁”机制来实现线程安全的单例，但并不建议大量采用，可以根据情况来选用。
+
+## 静态内部类
+
+利用类加载器机制和静态内部类，可以实现线程安全和延迟加载，且实现十分简单。
+
+```java
+public class LazySingleton3 {
+
+    private LazySingleton3() {}
+
+    // 静态内部类
+    private static class SingletonHolder {
+        private static final LazySingleton3 instance = new LazySingleton3();
+    }
+
+    // 在调用该方法之前，静态内部类不会被加载，因此也不会创建单例对象
+    public static LazySingleton3 getInstance() {
+        return SingletonHolder.instance;
+    }
+
+}
+```
+
+这种实现方式，无需使用同步，仅依赖于类加载器机制来保证线程安全，同时又实现了懒加载，是开发中很常用的单例模式实现方式。
+
+## 枚举类
+
+枚举也可以用来实现单例模式，且更简洁，能避免多线程同步问题，支持序列化机制，防止反序列化重新创建新的对象。
+
+```java
+public enum Singletion {
+    // 只定义一个枚举的元素
+    instance;
+    
+    // 枚举类可以进行某种操作
+    public void doSomething() {
+        
+    }
+}
+```
+
+这种方式不属于懒加载，如果需要避免反序列化来创建新对象可以用枚举类来实现单例。
+
 ## 参考链接
 
 * [单例模式](https://www.runoob.com/design-pattern/singleton-pattern.html)
+* [《JAVA与模式》之单例模式](https://www.cnblogs.com/java-my-life/archive/2012/03/31/2425631.html)
