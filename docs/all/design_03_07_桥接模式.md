@@ -1,12 +1,12 @@
 <!--
 date: 2021-12-21T22:34:12+08:00
-lastmod: 2021-12-21T22:34:12+08:00
+lastmod: 2021-12-22T22:34:12+08:00
 -->
-## 
+## 桥接模式（Bridge Pattern）
 
 
 
 ## 参考链接
 
-* [适配器模式](https://www.runoob.com/design-pattern/adapter-pattern.html)
-* [《JAVA与模式》之适配器模式](https://www.cnblogs.com/java-my-life/archive/2012/04/13/2442795.html)
+* [桥接模式](https://www.runoob.com/design-pattern/bridge-pattern.html)
+* [简说设计模式——桥接模式](https://www.cnblogs.com/adamjwh/p/9033548.html)
