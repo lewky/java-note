@@ -1,16 +1,84 @@
 <!--
 date: 2021-06-29T22:46:12+08:00
-lastmod: 2021-07-19T22:46:12+08:00
+lastmod: 2022-01-29T22:46:12+08:00
 -->
-## 使用线程
+## 线程与进程
 
-线程有三种使用方式：
+1）进程，每个进程都有独立的代码和数据空间，切换进程开销大<br>
+2）线程，同一类的线程共享代码和数据空间，单个线程有独立的运行权和程序计数器(`program counter`)，切换线程开销小<br>
+3）进程和线程都是描述CPU工作的时间段，线程是粒度更细小的时间段。
 
-1）继承Thread类（Thread类本身实现了Runnable接口）<br>
-2）实现Runnable接口<br>
-3）实现Callable接口
+## java的线程
 
-实现接口的方式并不是真正定义了一个线程，而是定义了一个可以被Thread类运行的任务，通过Thread的构造器传递给Thread对象以调用。Thread对象通过调用`start()`方法来启动线程，并执行对应的任务（即调用重写的`run()`方法）。
+jvm启动时会创建一个`main`线程来执行`public static void main(String[] args)`方法里面的代码
+
+java的线程机制是抢占式的，这表示调度机制会周期性中断线程，将上下文切换到另一个线程，从而为每个线程都提供处理器时间片来驱动
+
+## 线程的四种使用方式
+
+### 继承Thread类
+
+```java
+// 定义一个线程
+public class MyThread extends Thread {
+    public void run() {
+        // ...
+    }
+}
+
+// 执行该线程
+public static void main(String[] args) {
+    MyThread mt = new MyThread();
+    mt.start();
+}
+```
+
+### 实现Runnable接口
+
+```java
+// 定义一个可执行任务
+public class MyRunnable implements Runnable {
+    @Override
+    public void run() {
+        // ...
+    }
+}
+
+// 执行该任务
+public static void main(String[] args) {
+    MyRunnable instance = new MyRunnable();
+    Thread thread = new Thread(instance);
+    thread.start();
+}
+```
+
+### 实现Callable接口
+
+```java
+// 定义一个可执行任务
+public class MyCallable implements Callable<String> {
+    public String call() {
+        return "callable";
+    }
+}
+
+// 执行该任务
+public static void main(String[] args) throws ExecutionException, InterruptedException {
+    MyCallable mc = new MyCallable();
+    FutureTask<Integer> ft = new FutureTask<>(mc);
+    Thread thread = new Thread(ft);
+    thread.start();
+    System.out.println(ft.get());
+}
+```
+
+### 使用ExecutorService
+
+前三种方式都是手动一个个创建线程来执行定义的任务，ExecutorService则是JDK自身提供的线程池框架，通过该框架来使用多线程以达到复用线程的目的。
+
+## Thread、Runnable和Callable区别
+
+实现接口的方式并不是真正定义了一个线程，而是定义了一个可以被Thread类运行的任务，通过Thread的构造器传递给Thread对象以调用。Thread类本身实现了Runnable接口，Thread对象通过调用`start()`方法来启动线程，并执行对应的任务（即调用重写的`run()`方法）：
 
 ```java
 public class Thread implements Runnable {
@@ -22,8 +90,6 @@ public class Thread implements Runnable {
     }
 }
 ```
-
-### Runnable和Callable区别
 
 1）实现Runnable接口需要重写run方法，实现Callable接口需要重写call方法。<br>
 2）Callable可以有返回值，返回值通过FutureTask进行封装。获取执行结果的get方法是一个阻塞的方法，直到任务执行完毕才能获取到结果。<br>
@@ -41,24 +107,6 @@ public static void main(String[] args) throws Exception {
 
 1）Java不支持多重继承，实现接口的方式更加灵活。<br>
 2）通常只需要定义一个可执行任务即可，然后通过线程池来执行这些任务，而直接继承Thread的方式开销较大。
-
-## 线程池
-
-创建和销毁线程的开销较大，可以通过池化技术来管理、复用线程对象以降低开销。（类比于数据库连接和连接池）
-
-好处：
-
-1）降低资源消耗。通过复用已创建的线程对象来降低线程在创建和销毁时的开销。<br>
-2）提高响应速度。当任务到达时，无需等待线程创建就能立即执行任务。<br>
-3）提高线程的可管理性。可以对线程进行统一分配、调优和监控。
-
-## Executor
-
-JDK 1.5引入了Executor框架，其实现的正是线程池的功能。
-
-### Executors
-
-
 
 ## 基础线程机制
 
