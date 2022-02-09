@@ -168,6 +168,7 @@ public String call() throws InterruptedException {
 4）守护线程创建的线程会自动设置为守护线程，原理是初始化线程时会获取当前线程的daemon来设置自身的daemon。（daemon是Thread中的一个私有boolean变量，默认是false）
 
 ```java
+// 使用守护线程的例子
 public class DaemonThreadStudy {
     private static class DaemonThreadFactory implements ThreadFactory {
         @Override
@@ -202,6 +203,10 @@ public class DaemonThreadStudy {
     }
 }
 ```
+
+## 中断
+
+
 
 ## 参考链接
 

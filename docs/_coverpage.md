@@ -1,10 +1,8 @@
-![logo](https://cdn.jsdelivr.net/gh/lewky/java-note@main/docs/static/favicon.jpg)
+![logo](https://cdn.jsdelivr.net/gh/lewky/java-note@main/docs/static/java.jpg)
 
-# Java笔记
+> 📚 Java学习笔记：包括Java基础知识、进阶、设计模式、并发、数据库、LeetCode、面试题等。
 
-> 个人向的Java学习笔记
-
-* 坚持就是胜利
-* 奥利给
+* 📖好记性不如烂笔头
+* 头笔烂如不性记好📖
 
 [开始阅读](/README)
