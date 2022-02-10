@@ -1,6 +1,6 @@
 <!--
 date: 2021-06-29T22:46:12+08:00
-lastmod: 2022-02-09T22:46:12+08:00
+lastmod: 2022-02-10T22:46:12+08:00
 -->
 ## 线程与进程
 
@@ -85,9 +85,9 @@ public static void main(String[] args) throws ExecutionException, InterruptedExc
 }
 ```
 
-### 使用ExecutorService
+### 使用Executor
 
-前三种方式都是手动一个个创建线程来执行定义的任务，ExecutorService则是JDK自身提供的线程池框架，通过该框架来使用多线程以达到复用线程的目的。
+前三种方式都是手动一个个创建线程来执行定义的任务，Executor则是JDK自身提供的线程池框架，通过该框架来使用多线程以达到复用线程的目的。
 
 * [线程池](/all/concurrency_02_线程池)
 
@@ -206,9 +206,151 @@ public class DaemonThreadStudy {
 
 ## 中断
 
+一个线程执行完毕后会自动结束，如果在执行过程中发生异常也会提前结束。
+
+### interrupt()
+
+调用一个线程的`interrupt()`方法，会为该线程设置一个中断标志，至于该线程是否提前结束取决于具体的业务代码。但是如果该线程处于阻塞、限期等待或无限期等待状态，则会抛出InterruptedException，从而提前结束该线程，不再继续执行后续的语句。
+
+需要注意的是，`interrupt()`方法无法中断处于I/O阻塞和synchronized锁阻塞的线程。（InterruptibleChannel和java.nio.channels.Selector除外，这两个会提前结束线程，详见jdk中interrupt()的注释。）
+
+### isInterrupted()
+
+用于判断线程是否处于中断状态，该方法实际是调用另一个同名带参数的本地方法：
+
+```java
+public boolean isInterrupted() {
+    return isInterrupted(false);
+}
+
+// ClearInterrupted参数表明是否清除线程的中断标志
+private native boolean isInterrupted(boolean ClearInterrupted);
+```
+
+### interrupted()
+
+这是个静态方法，同样用于判断当前线程是否处于中断状态，但区别是该方法在调用后会清除当前线程的中断标志。换言之，对于一个处于中断状态的线程，在第二次调用该方法时会得到不同的结果。这也是该方法名字取过去式的原因，其源码如下：
+
+```java
+public static boolean interrupted() {
+    return currentThread().isInterrupted(true);
+}
+```
+
+### 样例代码
+
+```java
+// Demo#1
+public class InterruptDemo implements Runnable {
+
+    @Override
+    public void run() {
+        while (true) {
+            System.out.println("Running.");
+        }
+    }
+
+    public static void main(final String[] args) {
+        final Thread thread = new Thread(new InterruptDemo());
+        thread.start();
+        // 仅仅设置了中断标志，线程依然会无限循环下去
+        thread.interrupt();
+    }
+}
+
+// Demo#2
+public class InterruptDemo implements Runnable {
+
+    @Override
+    public void run() {
+        while (true) {
+            System.out.println("Running.");
+            // 接收到中断标志，主动return，打破无限循环
+            if (Thread.currentThread().isInterrupted()) {
+                return;
+            }
+        }
+    }
+
+    public static void main(final String[] args) {
+        final Thread thread = new Thread(new InterruptDemo());
+        thread.start();
+        thread.interrupt();
+    }
+}
+
+// Demo#3
+public class InterruptDemo implements Runnable {
+
+    @Override
+    public void run() {
+        try {
+            Thread.sleep(1000);
+            // 由于线程处于休眠状态，此时调用其interrupt()导致抛出异常，try代码块中后续的语句无法继续执行
+            System.out.println("Running.");
+        } catch (final InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(final String[] args) {
+        final Thread thread = new Thread(new InterruptDemo());
+        thread.start();
+        thread.interrupt();
+    }
+}
+```
+
+### Executor的中断操作
+
+调用Executor的`shutdown()`方法会等待线程都执行完毕之后再关闭，但是如果调用的是`shutdownNow()`方法，则相当于调用每个线程的`interrupt()`方法。
+
+```java
+public static void main(String[] args) {
+    ExecutorService executorService = Executors.newCachedThreadPool();
+    executorService.execute(() -> {
+        try {
+            Thread.sleep(2000);
+            System.out.println("Thread run");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    });
+    // 立刻中断所有线程
+    executorService.shutdownNow();
+    System.out.println("Main run");
+}
+```
+
+如果只想中断Executor中的一个线程，可以通过使用`submit()`方法来提交一个线程，它会返回一个Future<?>对象，通过调用该对象的`cancel(true)`方法就可以中断线程。
+
+```java
+Future<?> future = executorService.submit(() -> {
+    // ..
+});
+future.cancel(true);
+```
+
+## 互斥同步
+
+
+
+## 线程间的协作
+
+当多个线程在一起工作时，某些工作的部分存在先后顺序，则需要对线程进行协调。
+
+### join()
+
+一个线程如果需要等待另一个线程先执行完成，则可以调用另一个线程的`join()`方法。此时当前线程会被挂起，直到另一个线程结束。join()会抛出InterruptedException，因此同样可以用interrupt()来中断它。
+
+join()方法有一个带时间参数的重载方法，当挂起指定时间后，不管目标线程是否结束都会返回执行原本挂起的线程。
+
+### wait() notify() notifyAll()
+
 
 
 ## 参考链接
 
 * [Java 并发](http://www.cyc2018.xyz/Java/Java%20%E5%B9%B6%E5%8F%91.html)
 * [Java多线程开发（一）| 基本的线程机制](https://www.jianshu.com/p/d094f6adb78e)
+* [Java中interrupt的使用](https://www.cnblogs.com/jenkov/p/juc_interrupt.html)
