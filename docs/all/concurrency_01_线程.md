@@ -1,6 +1,6 @@
 <!--
 date: 2021-06-29T22:46:12+08:00
-lastmod: 2022-02-10T22:46:12+08:00
+lastmod: 2022-02-13T22:46:12+08:00
 -->
 ## 线程与进程
 
@@ -333,7 +333,13 @@ future.cancel(true);
 
 ## 互斥同步
 
+当多个线程访问同一个共享资源时，可能会存在线程安全问题（只读不改就没事）。因此Java提供了两种锁机制来控制多线程对共享资源的互斥访问：
 
+第一种是JVM层面实现的synchronized，即JVM内置的锁机制；
+
+第二种是JDK实现（代码层面）的锁机制，即JUC（ java.util.concurrent）包下的各种组件，如ReentrantLock等。
+
+具体细节可以看：[Java的锁机制](/all/concurrency_03_锁机制)
 
 ## 线程间的协作
 
@@ -345,12 +351,95 @@ future.cancel(true);
 
 join()方法有一个带时间参数的重载方法，当挂起指定时间后，不管目标线程是否结束都会返回执行原本挂起的线程。
 
-### wait() notify() notifyAll()
+join()底层实际上是循环调用了线程对象的wait()方法，当目标线程结束时或者到了指定时间后，则会调用notifyAll()进行唤醒。
 
+### wait()、notify()、notifyAll()
 
+调用wait()会使当前线程进入等待状态，线程在等待时会被挂起，当其他线程调用notify()或notifyAll()时会唤醒被挂起的线程。和同步的概念有些不同，wait和notify是两个线程间的**通信机制**。
+
+使用wait()挂起期间，线程会释放锁。原因是如果没有释放锁，那么其它线程就无法进入对象的同步方法或者同步控制块中，那么就无法执行notify()或者notifyAll()来唤醒挂起的线程，造成死锁。
+
+这三个方法并非Thread类独有，而是属于Object类。
+
+### 为什么这三个方法放在Object类中
+
+因为只能在同步方法或同步控制块中使用这三个方法，否则会在运行时抛出IllegalMonitorStateException。使用这些方法必须标识同步所属的锁，而锁可以是任意对象，换言之，每个对象都可以上锁，所以这三个方法被定义在了Object类中。
+
+### wait()和sleep()的区别
+
+1）wait()是Object的方法，sleep()是Thread的静态方法<br>
+2）wait()会释放锁，sleep()不会
+
+### notify()和notifyAll()的区别
+
+首先需要明确两个概念：
+
+等待池：一个线程A调用了某个对象的wait()方法后，线程A就会释放该对象的锁，进入到该对象的等待池。**等待池中的线程不会竞争该对象的锁。**
+
+锁池：只有获取了对象的锁后，才能进入该对象的同步语句中。对象的锁同一时间只能被一个线程获取，其他竞争该对象锁的线程只能在该对象的锁池中等待。
+
+notify()会随机唤醒对象等待池中的一个线程，并进入锁池。
+
+notifyAll()会唤醒对象等待池中的所有线程，并进入锁池。
+
+### await()、signal()、signalAll()
+
+JUC包下提供了Condition类来实现线程间的通信，使用Lock来获取一个Condition对象，调用Condition对象的await()使线程等待，其他线程调用Condition对象的signal()或signalAll()方法来唤醒等待的线程。
+
+await()可以指定等待的条件，因此比wait()更加灵活。这两个方法都会抛出InterruptedException。
+
+## 线程状态
+
+一个线程只能处于一种状态，并且这里的线程状态特指Java虚拟机的线程状态，不能反映线程在特定操作系统下的状态。
+
+### 新建（NEW）
+
+创建后尚未启动。
+
+### 可运行（RUNABLE）
+
+允许在Java虚拟机中运行，Java将就绪（ready）和运行（running）统称为可运行状态。
+
+就绪状态的线程等待资源调度，以便进入运行状态。比如锁池中获得对象锁的线程，就属于就绪状态。
+
+### 阻塞（BLOCKED）
+
+线程请求获取monitor lock，从而进入对象的同步语句，但是由于其他线程已经占用了该monitor lock，导致请求的线程处于阻塞状态。只有当其他线程释放了monitor lock，线程才能从阻塞状态进入可运行状态。
+
+### 无限期等待（WAITING）
+
+不会被分配CPU时间，等待被其他线程显式地唤醒。
+
+和阻塞状态区别在于，阻塞是被动的，在等待获取monitor lock。而无限期等待是主动的。
+
+|进入方法|退出方法|
+|:-:|:-:|
+|Object中无时间参数的wait()|Object的notify()或notifyAll()|
+|Thread中无时间参数的join()|目标线程执行完毕|
+|LockSupport.park()|LockSupport.unpark(Thread)|
+
+### 限期等待（TIMED_WAITING）
+
+不会被分配CPU时间，无需等待被其他线程显式地唤醒，在一点时间后会自动唤醒。可以通过调用sleep()
+
+|进入方法|退出方法|
+|:-:|:-:|
+|Thread.sleep()|超时结束|
+|Object中有时间参数的wait()|超时结束 / Object的notify()或notifyAll()|
+|Thread中有时间参数的join()|超时结束 / 目标线程执行完毕|
+|LockSupport的parkNanos()或parkUntil()|LockSupport.unpark(Thread)|
+
+调用`Thread.sleep() `使线程进入限期等待状态时，常常用“使一个线程睡眠”进行描述。调用`Object.wait() `使线程进入限期等待或者无限期等待时，常常用“挂起一个线程”进行描述。
+
+睡眠和挂起用来描述行为，而阻塞和等待用来描述状态。
+
+### 终止（TERMINATED）
+
+线程执行任务结束后自行结束，也可以是执行过程中发生异常而提前结束。
 
 ## 参考链接
 
 * [Java 并发](http://www.cyc2018.xyz/Java/Java%20%E5%B9%B6%E5%8F%91.html)
 * [Java多线程开发（一）| 基本的线程机制](https://www.jianshu.com/p/d094f6adb78e)
 * [Java中interrupt的使用](https://www.cnblogs.com/jenkov/p/juc_interrupt.html)
+* [notify() 和 notifyAll() 有什么区别？](https://blog.csdn.net/meism5/article/details/90238268/)
