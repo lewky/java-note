@@ -1,6 +1,6 @@
 <!--
 date: 2021-06-29T22:46:12+08:00
-lastmod: 2022-02-13T22:46:12+08:00
+lastmod: 2022-02-14T22:46:12+08:00
 -->
 ## 线程与进程
 
@@ -107,16 +107,10 @@ public class Thread implements Runnable {
 ```
 
 1）实现Runnable接口需要重写run方法，实现Callable接口需要重写call方法。<br>
-2）Callable可以有返回值，返回值通过FutureTask进行封装。获取执行结果的get方法是一个阻塞的方法，直到任务执行完毕才能获取到结果。<br>
+2）Callable可以有返回值，返回值通过FutureTask进行封装。FutureTask中获取执行结果的`get()`方法是一个阻塞的方法，直到任务执行完毕才能获取到结果。<br>
 3）Callable会抛出异常，而Runnable只能在内部处理异常，不能继续往外抛。
 
-```java
-public static void main(String[] args) throws Exception {
-    FutureTask<String> task = new FutureTask<>(() -> "Done.");
-    new Thread(task).start();
-    System.out.println(task.get());
-}
-```
+其他细节可以看这个：[FutureTask](/all/concurrency_03_锁机制?id=异步任务futuretask)
 
 一般使用实现接口的方式来使用线程：
 

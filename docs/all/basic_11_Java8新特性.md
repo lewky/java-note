@@ -1,6 +1,6 @@
 <!--
 date: 2021-04-19T22:34:12+08:00
-lastmod: 2021-07-22T22:34:12+08:00
+lastmod: 2022-02-14T22:34:12+08:00
 -->
 ## Java8新特性
 
@@ -388,6 +388,8 @@ parallelStream cost:109
 ```
 
 可以看出，parallelStream快了很多，输出的结果也不是串行的。
+
+### parallelStream和ForkJoin
 
 parallelStream使用了Java7引入的并行执行框架`ForkJoin`和`ForkJoinPool`，ForkJoinPool维护了一个静态的通用线程池`static final ForkJoinPool common`。该线程池有一个`parallelism`变量，如果不手动设置该值，则默认等于运行计算机上的逻辑处理器数量-1。比如系统CPU是6核12线程，那么默认值就是11，该数量可以用`Runtime.getRuntime().availableProcessors()`获取。
 

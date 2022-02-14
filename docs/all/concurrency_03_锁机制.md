@@ -1,6 +1,6 @@
 <!--
 date: 2022-02-12T22:46:12+08:00
-lastmod: 2022-02-13T22:46:12+08:00
+lastmod: 2022-02-14T22:46:12+08:00
 -->
 ## synchronized
 
@@ -52,7 +52,11 @@ public synchronized static void func() {
 
 ## synchronized的可重入性
 
+synchronized是一个可重入锁，即一个线程可以在同步语句中调用同一个对象的其他同步方法。
 
+线程如果已经持有一个对象的锁，当再次请求该对象锁时是不会被阻塞的，换言之，同一个线程可以多次请求同一个对象锁，即对象锁是可重入的。
+
+对象锁关联了线程持有者id和计数器，当一个线程请求锁成功时，JVM会记录下持有锁的线程，并将计数器计为1。此时其他线程如果请求该对象锁则会进入等待，而持有该锁的线程再次请求该锁时，则可以拿到锁，并使计数器加1。当线程退出一个synchronized方法/块时，计数器会递减，当计数器为0时会释放该锁。
 
 ## JUC组件
 
@@ -77,6 +81,7 @@ public class LockExample {
     private Lock lock = new ReentrantLock();
 
     public void func() {
+        // 在获取锁成功之前会一直阻塞
         lock.lock();
         try {
             for (int i = 0; i < 10; i++) {
@@ -154,15 +159,28 @@ Demo如下：
 ```java
 public class CyclicBarrierExample {
 
-    public static void main(String[] args) {
+    static class MyRunnable implements Runnable {
+
+        @Override
+        public void run() {
+            System.out.println();
+            System.out.println("run barrierAction..");
+        }
+
+    }
+
+    public static void main(final String[] args) {
+        // 计数器初始值
         final int totalThread = 10;
-        CyclicBarrier cyclicBarrier = new CyclicBarrier(totalThread);
-        ExecutorService executorService = Executors.newCachedThreadPool();
+        // 全部线程到达屏障点时自动执行一次的barrierAction
+        final Runnable runnable = new MyRunnable();
+        final CyclicBarrier cyclicBarrier = new CyclicBarrier(totalThread, runnable);
+        final ExecutorService executorService = Executors.newCachedThreadPool();
         for (int i = 0; i < totalThread; i++) {
             executorService.execute(() -> {
                 System.out.print("before..");
                 try {
-					// 等待其他线程到达屏障点
+                    // 等待其他线程到达屏障点
                     cyclicBarrier.await();
                 } catch (InterruptedException | BrokenBarrierException e) {
                     e.printStackTrace();
@@ -175,14 +193,176 @@ public class CyclicBarrierExample {
 }
 ```
 
-### 信号标Semaphore
+输出如下：
 
+```java
+before..before..before..before..before..before..before..before..before..before..
+run barrierAction..
+after..after..after..after..after..after..after..after..after..after..
+```
 
+### 信号量Semaphore
+
+类似于操作系统的信号量，可以控制访问互斥资源的线程数量，常用于限流场景。
+
+Semaphore底层维护了令牌数量，线程通过调用`acquire()`获取一个令牌，在成功获取之前会一直处于阻塞状态（除非被其他线程中断）。有个带令牌数量参数的重载方法`acquire(int permits)`，可以一次获取多个令牌，获取成功后可用的令牌数量也会减少指定的数量。
+
+`tryAcquire()`同样用于获取一个令牌，但它不会阻塞，只会获取一次并返回获取结果是否成功；同样有个一次获取多个令牌的重载方法`tryAcquire(int permits)`，此外该方法还有其他带有超时等待参数的重载方法，允许在超时之前一直尝试获取令牌。
+
+`release()`用于释放令牌。Semaphore默认是非公平锁，可以通过构造方法来改变。
+
+```java
+public class SemaphoreExample {
+
+    public static void main(String[] args) {
+        // Semaphore令牌数量
+        final int clientCount = 3;
+        final int totalRequestCount = 10;
+        Semaphore semaphore = new Semaphore(clientCount);
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        for (int i = 0; i < totalRequestCount; i++) {
+            executorService.execute(()->{
+                try {
+                    // 获取令牌，在成功获取之前会一直阻塞
+                    semaphore.acquire();
+                    System.out.print(semaphore.availablePermits() + " ");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } finally {
+                    // 释放令牌
+                    semaphore.release();
+                }
+            });
+        }
+        executorService.shutdown();
+    }
+}
+```
+
+### 异步任务FutureTask
+
+JDK1.5新增了具备返回值和可撤销的任务Callable，其返回值由FutureTask封装。FutureTask中获取执行结果的`get()`方法是一个阻塞的方法，直到任务执行完毕才能获取到结果。
+
+```java
+public class FutureTask<V> implements RunnableFuture<V>
+
+public interface RunnableFuture<V> extends Runnable, Future<V>
+```
+
+FutureTask同样继承了Runnable接口，因此也可以像定义Runnable任务那样来使用，也可用于异步获取执行结果或取消执行任务的场景。
+
+当一个计算任务需要执行很长时间，那么就可以用FutureTask来封装这个任务，等主线程完成自己的任务后再去获取结果。
+
+```java
+public static void main(String[] args) throws Exception {
+    FutureTask<String> task = new FutureTask<>(() -> "Done.");
+    new Thread(task).start();
+    // 在成功获取结果之前会阻塞
+    System.out.println(task.get());
+}
+```
+
+### 阻塞队列接口BlockingQueue
+
+BlockingQueue接口继承了Queue接口，主要提供了两个新的阻塞方法：put()和take()，这两个接口的方法可以看这个[queue笔记](/all/container_01_数据结构概览?id=queue)。
+
+BlockingQueue接口主要有以下实现：
+
+1）**FIFO队列**：LinkedBlockingQueue（线性）、ArrayBlockingQueue（数组，固定长度）<br>
+2）**优先级队列** ：PriorityBlockingQueue
+
+下面是用ArrayBlockingQueue实现的一个简单生产者消费者demo：
+
+```java
+public class ProducerConsumer {
+
+    private static BlockingQueue<String> queue = new ArrayBlockingQueue<>(5);
+
+    private static class Producer extends Thread {
+        @Override
+        public void run() {
+            try {
+                // 向阻塞队列中新增一个元素
+                queue.put("product");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.print("produce..");
+        }
+    }
+
+    private static class Consumer extends Thread {
+
+        @Override
+        public void run() {
+            try {
+                // 从阻塞队列中取出一个元素
+                String product = queue.take();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.print("consume..");
+        }
+    }
+    
+    public static void main(String[] args) {
+        // 新增2个生产者
+        for (int i = 0; i < 2; i++) {
+            Producer producer = new Producer();
+            producer.start();
+        }
+        // 新增5个消费者
+        for (int i = 0; i < 5; i++) {
+            Consumer consumer = new Consumer();
+            consumer.start();
+        }
+        // 新增3个生产者
+        for (int i = 0; i < 3; i++) {
+            Producer producer = new Producer();
+            producer.start();
+        }
+    }
+
+}
+```
+
+### 并行执行框架ForkJoin
+
+JDK1.7引入了并行执行框架ForkJoin和ForkJoinPool，和MapReduce原理类似，都是把大的计算任务拆分成多个小任务并行计算，最终汇总每个小任务结果后得到大任务结果。
+
+ForkJoin使用ForkJoinPool来启动，它是一个特殊的线程池，线程数量取决于逻辑处理器数量。
+
+ForkJoinPool实现了**工作窃取算法**来提高CPU的利用率。每个线程都维护了一个双端队列，用来存储需要执行的任务。工作窃取算法允许空闲的线程从其它线程的双端队列中窃取一个任务来执行。窃取的任务必须是最晚的任务，避免和队列所属线程发生竞争，但是如果队列中只有一个任务时还是会发生竞争。
+
+JDK1.8新增的并行流parallelStream底层就使用了ForkJoin。关于parallelStream和ForkJoin的其他细节可以看[这部分笔记](/all/basic_11_Java8新特性?id=parallelstream%e5%92%8cforkjoin)。
 
 ### AQS（AbstractQueuedSynchronizer）
 
 
 
+## 线程安全
+
+多个线程并发访问共享资源时，每个线程都能够正常且正确的执行，不会出现数据污染等意外情况，这就是线程安全。
+
+线程安全有多种实现方式：
+
+### 不可变对象（Immutable）
+
+若共享资源是不可变对象，则必能保证线程安全。一个不可变对象在被初始化之后，其值就不能被改变，相当于只读不改。有以下不可变的类型：
+
+1）final关键字修饰的基本数据类型<br>
+2）String<br>
+3）枚举类型<br>
+4）基本数据类型对应的包装类型，BigInteger和BigDecimal等大数据类型。<br>
+5）使用`Collections.unmodifiableCollection()`将集合转变为不可变集合。
+
+### 互斥同步
+
+使用synchronized或JUC包的组件等锁机制来对多线程进行互斥同步。
+
+### 
+
 ## 参考链接
 
 * [Java 并发](http://www.cyc2018.xyz/Java/Java%20%E5%B9%B6%E5%8F%91.html)
+* [Java多线程：synchronized的可重入性 ](https://www.cnblogs.com/cielosun/p/6684775.html)
