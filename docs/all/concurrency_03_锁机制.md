@@ -340,28 +340,6 @@ JDK1.8新增的并行流parallelStream底层就使用了ForkJoin。关于paralle
 
 
 
-## 线程安全
-
-多个线程并发访问共享资源时，每个线程都能够正常且正确的执行，不会出现数据污染等意外情况，这就是线程安全。
-
-线程安全有多种实现方式：
-
-### 不可变对象（Immutable）
-
-若共享资源是不可变对象，则必能保证线程安全。一个不可变对象在被初始化之后，其值就不能被改变，相当于只读不改。有以下不可变的类型：
-
-1）final关键字修饰的基本数据类型<br>
-2）String<br>
-3）枚举类型<br>
-4）基本数据类型对应的包装类型，BigInteger和BigDecimal等大数据类型。<br>
-5）使用`Collections.unmodifiableCollection()`将集合转变为不可变集合。
-
-### 互斥同步
-
-使用synchronized或JUC包的组件等锁机制来对多线程进行互斥同步。
-
-### 
-
 ## 参考链接
 
 * [Java 并发](http://www.cyc2018.xyz/Java/Java%20%E5%B9%B6%E5%8F%91.html)
