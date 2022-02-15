@@ -1,6 +1,6 @@
 <!--
 date: 2022-02-12T22:46:12+08:00
-lastmod: 2022-02-14T22:46:12+08:00
+lastmod: 2022-02-15T22:46:12+08:00
 -->
 ## synchronized
 
@@ -60,7 +60,7 @@ synchronized是一个可重入锁，即一个线程可以在同步语句中调�
 
 ## JUC组件
 
-JUC即java.util.concurrent包，提供了许多并发组件，而AQS（AbstractQueuedSynchronizer，抽象队列式同步器）被认为是JUC的核心，许多组件的实现都依赖于它。
+JUC即java.util.concurrent包，提供了许多并发组件，而AQS（AbstractQueuedSynchronizer，抽象队列式同步器）被认为是JUC的核心，许多组件的实现都依赖于它。具体可以看看这部分[AQS笔记](/all/concurrency_04_内存模型?id=aqs（abstractqueuedsynchronizer）)。
 
 ### 可重入锁ReentrantLock
 
@@ -336,11 +336,7 @@ ForkJoinPool实现了**工作窃取算法**来提高CPU的利用率。每个线�
 
 JDK1.8新增的并行流parallelStream底层就使用了ForkJoin。关于parallelStream和ForkJoin的其他细节可以看[这部分笔记](/all/basic_11_Java8新特性?id=parallelstream%e5%92%8cforkjoin)。
 
-### AQS（AbstractQueuedSynchronizer）
-
-
-
 ## 参考链接
 
 * [Java 并发](http://www.cyc2018.xyz/Java/Java%20%E5%B9%B6%E5%8F%91.html)
-* [Java多线程：synchronized的可重入性 ](https://www.cnblogs.com/cielosun/p/6684775.html)
+* [Java多线程：synchronized的可重入性](https://www.cnblogs.com/cielosun/p/6684775.html)
