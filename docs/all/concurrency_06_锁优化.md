@@ -8,11 +8,11 @@ JDK1.6对synchronized进行了优化，这里涉及到了Java对象头的知识�
 
 存储在内存中的Java对象由对象头、实例数据和对齐填充字节组成，其中的对象头由Mark Word、指向类的指针和数组长度（只有数组对象才有）组成。
 
-Mark Word记录了对象和锁有关的信息，当这个对象被synchronized关键字当成同步锁时，围绕这个锁的一系列操作都和Mark Word有关。
+Mark Word在32位JVM中的长度是32bit，在64位JVM中长度是64bit。在32位JVM中主要存储的是当前对象的HashCode、锁标志位，垃圾回收标记，分代年龄，还会保存指向锁记录（Lock Record）的指针，指向Monitor的指针，偏向锁线程ID等。
 
-Mark Word在32位JVM中的长度是32bit，在64位JVM中长度是64bit。在32位JVM中主要存储的是描述对象的hash、锁信息，垃圾回收标记，年龄还会保存指向锁记录的指针，指向monitor的指针，偏向锁线程ID等。
+Mark Word被设计成一个非固定结构，在运行期间会随着锁标志位的变化而变化。
 
-JDK1.6开始在处理同步锁时存在锁升级的概念，JVM对于同步锁的处理从偏向锁开始，随着竞争越来越激烈，处理方式从偏向锁升级到轻量级锁，最终升级到重量级锁。
+![Mark Word](https://cdn.jsdelivr.net/gh/lewky/java-note@main/docs/static/images/markword.jpg)
 
 ## 实例数据
 
@@ -22,10 +22,65 @@ JDK1.6开始在处理同步锁时存在锁升级的概念，JVM对于同步锁�
 
 因为JVM要求Java的对象占的内存大小应该是8bit的倍数，所以后面有几个字节用于把对象的大小补齐至8bit的倍数，没有特别的功能。
 
+## 锁升级
+
+synchronized实际上是对对象加锁的过程：**锁一段代码需要指定对象，锁一个普通方法时锁的是方法的对象，锁一个静态方法时锁的是方法所在类的对象**。
+
+对对象加锁，就是获取一个对象锁。每一个对象的对象头会关联一个Monitor对象，这个Monitor对象的实现底层是用C++写的，它持有一个计数器，当这个Monitor对象被某个线程获取时，计数器就会加1，被线程释放时就会减1。
+
+在JDK1.6之前，synchronized属于重量级的锁，每次加锁都通过操作系统来申请锁，这里涉及到用户态到内核态的切换，因此效率较低。随着时代发展，多线程并发量越来越大，synchronized的性能显得越发低下。
+
+于是从JDK1.6开始对synchronized进行了优化，在处理同步锁时存在锁升级的概念，级别从低到高依次是：**无锁（unlocked），偏向锁（biasble），轻量级锁（lightweight locked），重量级锁（inflated）**。
+
+锁升级的过程，就是JVM对锁的优化。
+
+## 无锁
+
+不存在竞争，线程不需要获取锁。
+
 ## 偏向锁
 
 
 
+## 轻量级锁
+
+## 重量级锁
+
+
+## 锁消除
+
+除了锁升级，JVM还从代码层面对锁进行了优化：锁消除和锁粗化。
+
+当一段代码中加了锁，但JVM通过逃逸分析检测出当前共享数据不可能存在多线程竞争，那么就可以将其当做私有数据来对待，JVM就会将锁消除。
+
+字符串拼接使用StringBuffer的`append()`方法是一个同步方法，每次执行都会加锁，但如果只在一个方法中去拼接局部变量，那么JVM发现其是线程安全的，就可以消除这个锁：
+
+```java
+public static String concatString(String s1, String s2, String s3) {
+    StringBuffer sb = new StringBuffer();
+    sb.append(s1);
+    sb.append(s2);
+    sb.append(s3);
+    return sb.toString();
+}
+```
+
+## 锁粗化
+
+当JVM检测到一系列的连续操作都对同一个对象反复加锁和解锁，那么JVM就可能会将锁的范围扩展到这段代码，只加一个锁，避免频繁的加锁操作导致性能损耗。
+
+比如上述的StringBuffer例子，连续用`append()`拼接了三个字符串，JVM可能会将第一个`append()`的锁范围扩展到最后一个`append()`后面，将原本的三个锁粗化成了一个锁。
+
+## 总结
+
+从偏向锁到轻量级锁是Java内部的优化，属于所谓的用户态，而重量级锁是向操作系统申请，属于内核态。
+
+在锁竞争不激烈的时候由JVM自己解决肯定性能是最好的，但是JVM通过自旋方式解决会消耗CPU性能，所以在锁竞争激烈的情况下重量级锁性能更好。
+
+**锁升级是机制层面的优化，而锁消除和锁粗化则是JVM对代码层面的优化。**
+
 ## 参考链接
 
 * [Java 并发](http://www.cyc2018.xyz/Java/Java%20%E5%B9%B6%E5%8F%91.html)
+* [简述面试常见问题的锁升级与锁优化](https://baijiahao.baidu.com/s?id=1669027594605610676&wfr=spider&for=pc)
+* [锁升级 锁降级](https://zhuanlan.zhihu.com/p/139793053)

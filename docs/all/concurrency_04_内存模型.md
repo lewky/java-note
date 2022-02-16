@@ -208,22 +208,69 @@ public class Test {
 2）synchronized<br>
 3）final。被final修饰的变量在构造器中完成初始化后，且没有发生[this逃逸](/all/concurrency_01_线程?id=this逃逸)，那么其它线程就能看见final字段的值。
 
-需要注意的是，对于上述代码实例中的cnt变量，用volatile修饰并不能保证线程安全。因为volatile仅仅保证了可见性，并不能保证一组操作的原子性。
+需要注意的是，对于上述代码实例中的cnt变量，用volatile修饰并不能保证线程安全。因为**volatile仅仅保证了可见性**，并不能保证一组操作的原子性。
 
 ### 有序性
 
+在本线程内观察，所有操作都是有序的。但是在一个线程观察另一个线程，所有操作都是无序的。无序是因为发生了**指令重排序**。
 
+在JMM中，允许编译器和处理器对指令重新排序，重排序过程不会影响到单线程程序的执行，却会影响到多线程并发执行的正确性。
 
-## 先行发生原则
+volatile关键字通过**添加内存屏障的方式来禁止指令重排序**，即重排序时不能把后面的指令放到内存屏障之前。
 
+synchronized关键字也可以保证有序性，它保证每个时刻只有一个线程执行同步代码，相当于是让线程顺序执行同步代码。
 
+## 先行发生原则（Happens-Before）
+
+先行发生是JMM中定义的两项操作之间的偏序关系，如果操作A先行发生于操作B，那么操作A产生的影响能够被操作B观察到。
+
+JMM规定了以下先行发生原则（实际上部分已经在前文提及了）：
+
+### 单一线程原则（Single Thread rule）
+
+在一个线程中，前面的代码先行发生于后面的代码，准确的说是控制流顺序，因为要考虑到分支和循环结构。
+
+### 管程锁定规则（Monitor Lock Rule）
+
+一个unlock操作先行发生于后面（时间上）对同一个锁的lock操作。（即synchronized保证了有序性）
+
+### volatile变量规则（Volatile Variable Rule）
+
+对一个volatile变量的写操作先行发生于后面（时间上）对这个变量的读操作。（即volatile保证了有序性）
+
+### 线程启动规则（Thread Start Rule）
+
+Thread对象的`start()`方法先行发生于这个线程的每一个操作。
+
+### 线程加入规则（Thread Join Rule）
+
+Thread对象的结束先行发生于`join()`方法返回。
+
+### 线程中断规则（Thread Interruption Rule）
+
+对线程`interrupt()`方法的调用先行发生于被中断线程的代码检测到中断事件的发生，可以通过`interrupted()`方法检测到是否有中断发生。（即interrupt()会先设置中断标志，然后才会在线程处于阻塞、限期等待或无限期等待状态时会抛出InterruptedException）
+
+### 对象终结规则（Finalizer Rule）
+
+一个对象的初始化完成（构造函数执行结束）先行发生于它的`finalize()`的开始。
+
+### 传递性（Transitivity）
+
+如果操作A先行发生于操作B，操作B先行发生于操作C，那么操作A先行发生于操作C。
+
+总结：一个操作“时间上的先发生”不代表这个操作先行发生；一个操作先行发生也不代表这个操作在时间上是先发生的（重排序的出现）。时间上的先后顺序对先行发生没有太大的关系，所以衡量并发安全问题的时候不要受到时间顺序的影响，一切以先行发生原则为准。
 
 ## volatile
 
+总结下前文中volatile关键字的作用：
 
+1）保证了可见性。一个线程修改了volatile变量的值，其它线程能够立即得知这个修改。<br>
+2）保证了有序性。通过添加内存屏障，禁止了指令重排序。
 
 ## 参考链接
 
 * [Java 并发](http://www.cyc2018.xyz/Java/Java%20%E5%B9%B6%E5%8F%91.html)
 * [区分内存、外存、主存、辅存等](https://blog.51cto.com/u_10739931/1698313)
 * [Java内存模型（JMM）总结](https://zhuanlan.zhihu.com/p/29881777)
+* [先行发生原则（Happens-before）](https://www.cnblogs.com/austinspark-jessylu/p/7273522.html)
+* [Java并发编程：volatile关键字解析](https://www.cnblogs.com/dolphin0520/p/3920373.html)
