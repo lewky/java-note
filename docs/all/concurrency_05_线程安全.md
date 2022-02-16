@@ -1,6 +1,6 @@
 <!--
 date: 2022-02-14T22:46:12+08:00
-lastmod: 2022-02-14T22:46:12+08:00
+lastmod: 2022-02-16T22:46:12+08:00
 -->
 ## 线程安全
 
@@ -63,6 +63,10 @@ JUC包提供了带有标记的原子引用类AtomicStampedReference可以解决�
 每个Thread对象都有一个ThreadLocal.ThreadLocalMap对象，在调用ThreadLocal的`set(T value)`时会将当前的ThreadLocal对象作为key，将value作为值存入该Map中。ThreadLocal的`get()`则是从该Map中获取出来之前存入的值。
 
 在每次使用ThreadLocal后应该尽可能手动调用remove()，以避免出现ThreadLocal经典的内存泄漏、甚至是造成自身业务混乱的风险。
+
+## AQS（AbstractQueuedSynchronizer）
+
+在了解了以上线程安全的知识后，这里顺便解析下AQS的源码实现。
 
 ## 参考链接
 

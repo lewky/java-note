@@ -60,7 +60,7 @@ synchronized是一个可重入锁，即一个线程可以在同步语句中调�
 
 ## JUC组件
 
-JUC即java.util.concurrent包，提供了许多并发组件，而AQS（AbstractQueuedSynchronizer，抽象队列式同步器）被认为是JUC的核心，许多组件的实现都依赖于它。具体可以看看这部分[AQS笔记](/all/concurrency_04_内存模型?id=aqs（abstractqueuedsynchronizer）)。
+JUC即java.util.concurrent包，提供了许多并发组件，而AQS（AbstractQueuedSynchronizer，抽象队列式同步器）被认为是JUC的核心，许多组件的实现都依赖于它。具体可以看看这部分[AQS笔记](/all/concurrency_05_线程安全?id=aqs（abstractqueuedsynchronizer）)。
 
 ### 可重入锁ReentrantLock
 

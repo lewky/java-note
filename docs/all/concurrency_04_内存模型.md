@@ -1,6 +1,6 @@
 <!--
 date: 2022-02-13T22:46:12+08:00
-lastmod: 2022-02-15T22:46:12+08:00
+lastmod: 2022-02-16T22:46:12+08:00
 -->
 ## Java内存模型（Java Memory Model，JMM）
 
@@ -206,15 +206,19 @@ public class Test {
 
 1）volatile<br>
 2）synchronized<br>
-3）final
+3）final。被final修饰的变量在构造器中完成初始化后，且没有发生[this逃逸](/all/concurrency_01_线程?id=this逃逸)，那么其它线程就能看见final字段的值。
+
+需要注意的是，对于上述代码实例中的cnt变量，用volatile修饰并不能保证线程安全。因为volatile仅仅保证了可见性，并不能保证一组操作的原子性。
 
 ### 有序性
 
+
+
+## 先行发生原则
+
+
+
 ## volatile
-
-
-
-## AQS（AbstractQueuedSynchronizer）
 
 
 
