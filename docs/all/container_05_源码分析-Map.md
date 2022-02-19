@@ -431,7 +431,7 @@ protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
 
 ### 概览
 
-WeakHashMap继承自AbstractMap，实现了Map接口，这是一个使用弱引用对象来包装key的map容器。（JDK 1.2扩充了引用的概念，细分为强引用、软引用、弱引用、虚引用四种引用。）
+WeakHashMap继承自AbstractMap，实现了Map接口，这是一个使用弱引用对象来包装key的map容器。（JDK 1.2扩充了引用的概念，细分为强引用、软引用、弱引用、虚引用四种引用，可以看[这部分笔记](/all/jvm_02_垃圾收集?id=引用类型)）
 
 WeakHashMap的Entry继承自WeakReference，底层使用该Entry数组来存储键值对。在下一次垃圾回收时弱引用对象中的key会被回收，然后该弱引用对象Entry会被放到一个队列中。
 
