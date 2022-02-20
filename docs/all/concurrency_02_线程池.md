@@ -1,6 +1,6 @@
 <!--
 date: 2022-01-29T22:46:12+08:00
-lastmod: 2022-01-29T22:46:12+08:00
+lastmod: 2022-02-20T22:46:12+08:00
 -->
 ## 线程池
 
@@ -18,7 +18,7 @@ JDK 1.5引入了Executor框架，其实现的正是线程池的功能。Java里�
 
 主要有如下三种线程池：
 
-1）CachedThreadPool：一个任务创建一个线程<br>
+1）CachedThreadPool：一个任务创建一个线程，线程池无限大，会自动回收空闲线程<br>
 2）FixedThreadPool：无论任务多少，只能重用固定数量的线程<br>
 3）SingleThreadExecutor：只有单例线程，即大小为1的FixedThreadPool
 
@@ -28,7 +28,29 @@ JDK 1.5引入了Executor框架，其实现的正是线程池的功能。Java里�
 
 ## ThreadPoolExecutor参数含义
 
+ThreadPoolExecutor提供了多个构造方法，参数最齐全的如下：
 
+```java
+public ThreadPoolExecutor(int corePoolSize,
+            　　　　　　　  int maximumPoolSize,
+                           long keepAliveTime,
+                           TimeUnit unit,
+                           BlockingQueue<Runnable> workQueue,　　　　　　　　　　　　　　　　　　
+						   ThreadFactory threadFactory,
+                           RejectedExecutionHandler handler) {
+
+}
+```
+
+这些参数的含义如下：
+
+1）corePoolSize： 线程池核心线程数<br>
+2）maximumPoolSize：线程池最大数<br>
+3）keepAliveTime： 空闲线程存活时间<br>
+4）unit： 时间单位<br>
+5）workQueue： 线程池所使用的缓冲队列<br>
+6）threadFactory：线程池创建线程使用的工厂<br>
+7）handler： 线程池对拒绝任务的处理策略<br>
 
 ## 参考链接
 
