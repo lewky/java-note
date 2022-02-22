@@ -16,7 +16,7 @@ lastmod: 2022-02-21T22:46:12+08:00
 
 JDK 1.5引入了Executor框架，其实现的正是线程池的功能。Java里线程池的顶级接口是Executor，但是严格意义上讲Executor并不是一个线程池，而只是一个执行线程的工具，真正的线程池接口是ExecutorService。
 
-主要有如下三种线程池：
+主要有如下线程池：
 
 1）CachedThreadPool：一个任务创建一个线程，线程池无限大，会自动回收空闲线程<br>
 2）FixedThreadPool：无论任务多少，只能重用固定数量的线程<br>
