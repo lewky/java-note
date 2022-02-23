@@ -5,3 +5,4 @@
 * [MVCC](/all/db_03_MVCC)
 * [RMDB设计理论](/all/db_04_RMDB设计理论)
 * [MySQL](/all/db_05_MySQL)
+* [Redis](/all/db_06_Redis)
