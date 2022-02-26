@@ -9,6 +9,7 @@
 	* [异常](/all/basic_07_异常)
 	* [泛型](/all/basic_08_泛型)
 	* [注解](/all/basic_09_注解)
+	* ---
 	* [Java7新特性](/all/basic_10_Java7新特性)
 	* [Java8新特性](/all/basic_11_Java8新特性)
 * [<i class="fas fa-fw fa-box"></i> 容器篇](/all/container_0)
@@ -21,7 +22,9 @@
 	* [面向对象](/all/design_01_面向对象)
 	* [UML类图](/all/design_02_UML类图)
 	* [设计模式](/all/design_03_00_设计模式)
+	* ---
     * [系统设计基础](/all/design_04_系统设计基础)
+	* [分布式](/all/design_05_分布式)
 * [<i class="fas fa-fw fa-lightbulb"></i> JVM篇](/all/jvm_0)
 	* [内存分区](/all/jvm_01_内存分区)
 	* [垃圾收集](/all/jvm_02_垃圾收集)
