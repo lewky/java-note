@@ -42,6 +42,7 @@
 	* [MVCC](/all/db_03_MVCC)
 	* [RMDB设计理论](/all/db_04_RMDB设计理论)
 	* [MySQL](/all/db_05_MySQL)
+    * [MySQL优化](/all/db_05_01_MySQL优化)
 	* [Redis](/all/db_06_Redis)
 * [<i class="fas fa-fw fa-laptop-code"></i> 算法篇](/all/algorithm_0)
 	* [位运算](/all/algorithm_01_位运算)
